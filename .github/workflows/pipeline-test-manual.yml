@@ -21,6 +21,7 @@ on:
         type: choice
         required: true
         options:
+        - None
         - CI
         - SIT
         - UAT
