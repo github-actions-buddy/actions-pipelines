@@ -22,6 +22,7 @@ on:
         required: true
         options:
         - CI
+        - SIT
         - UAT
         - PRODUCTION
       
