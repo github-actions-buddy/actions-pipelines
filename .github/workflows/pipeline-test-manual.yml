@@ -79,16 +79,16 @@ jobs:
       # check env and branch
       - name: Check branch and env
         run: |
-          if [ "${{ env.TARGET_ENVIRONMNET }}" == "CI" ] && [ "${{ github.base_ref }}" != "develop" ]; then
+          if [ "${{ env.TARGET_ENVIRONMNET }}" == "CI" ] && [ "${{ inputs.targetBranch }}" != "develop" ]; then
             echo "Error: CI environment can only be used with develop"
             exit 1
-          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "SIT" ] && [ "${{ github.base_ref }}" != "int" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "SIT" ] && [ "${{ inputs.targetBranch }}" != "int" ]; then
             echo "Error: SIT environment can only be used with int branch"
             exit 1
-          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "UAT" ] && [ "${{ github.base_ref }}" != "releases" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "UAT" ] && [ "${{ inputs.targetBranch }}" != "releases" ]; then
             echo "Error: UAT environment can only be used with releases branch"
             exit 1
-          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "PROD" ] && [ "${{ github.base_ref }}" != "main" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "PROD" ] && [ "${{ inputs.targetBranch }}" != "main" ]; then
             echo "Error: PROD environment can only be used with main branch"
             exit 1
           fi
