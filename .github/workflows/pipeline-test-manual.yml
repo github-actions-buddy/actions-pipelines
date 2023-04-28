@@ -111,13 +111,6 @@ jobs:
         with:
           node-version: "18"
 
-      # Install Git
-      - name: Install Git
-        run: |
-          sudo apt update
-          sudo apt-get install -y git
-          git --version
-
       # check env and branch
       - name: Check branch and env
         run: |
