@@ -112,7 +112,6 @@ jobs:
         name: Install Python v3.7 and cache pip
         with:
           python-version: "3.7"
-          cache: "pip" # caching pip dependencies
 
       # Checking out repo before installing Node
       - uses: actions/checkout@v3
