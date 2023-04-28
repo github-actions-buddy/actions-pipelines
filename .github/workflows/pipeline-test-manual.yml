@@ -21,7 +21,7 @@ on:
         type: choice
         required: true
         options:
-        - SIT
+        - CI
         - UAT
         - PRODUCTION
       
@@ -29,6 +29,7 @@ on:
   pull_request:
     types: [opened, synchronize]
     branches:
+      - develop
       - integration
       - release
       - "integration/**"
@@ -49,7 +50,7 @@ jobs:
   installation_authenticate_deploy:
     runs-on: ubuntu-latest
     # Only executes next steps if Source branch name starts with develop
-    if: (startswith(${{inputs.sourceBranch}},'develop') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'develop/')))
+    if: (startswith(${{inputs.sourceBranch}},'feature') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'feature/')))
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
     steps:
@@ -103,7 +104,7 @@ jobs:
         with:
           name: pr_num
           path: ./pr_num.txt
-          retention-days: 30
+          retention-days: 15
 
       # Save source branch of PR
       - name: Save the source branch of Pull request
@@ -121,7 +122,7 @@ jobs:
         with:
           name: branch_name
           path: ./branch_name.txt
-          retention-days: 30
+          retention-days: 15
 
       # Checkout the current repository
       - name: Checkout Repository
@@ -172,14 +173,6 @@ jobs:
         run: |
           sfdx plugins:install @salesforce/sfdx-scanner
 
-      # Checkout acct-scripts repo
-      - name: Checkout Python_Scripts
-        uses: actions/checkout@v3
-        with:
-          repository: AlticeGroupIT/acct-scripts
-          token: ${{ secrets.V_METADATA_SEC }}
-          path: ./acct-scripts
-
       # Install Puppeteer
       - name: Install Puppeteer
         run: |
@@ -209,6 +202,24 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             + All dependencies installed
+
+      # check env
+      - name: Enviornment CHECK
+        run: |
+          # You can use different secrets from each environment and handle exceptions like this:
+          if [ "${{ github.event.inputs.environment }}" == "CI" ]; then
+            echo "Using secrets from Test_Deploy environment: ${{ secrets.HELLO }}, ${{ secrets.WELCOME }}, ${{ secrets.DEPLOY }}"
+          elif [ "${{ github.event.inputs.environment }}" == "SIT" ]; then
+            echo "Using secrets from SIT environment: ${{ secrets.HELLO2SIT }}, ${{ secrets.SIT }}"
+          elif [ "${{ github.event.inputs.environment }}" == "UAT" ]; then
+            echo "Using secrets from UAT environment: ${{ secrets.HELLO2UAT }}, ${{ secrets.UAT }}"
+          elif [ "${{ github.event.inputs.environment }}" == "PROD" ]; then
+            echo "Using secrets from PROD environment: ${{ secrets.HELLO2PROD }}, ${{ secrets.PROD }}"
+          else
+            echo "Error: Invalid environment selected"
+            exit 1
+          fi
+
 
       # Set Pull Request Status
       - name: Set PR Status
