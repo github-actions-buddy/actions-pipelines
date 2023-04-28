@@ -47,7 +47,7 @@ env:
   TARGET_ENVIRONMNET: ${{ inputs.targetEnv }}
 
 jobs:
-  installation_authenticate_deploy:
+  test_job:
     runs-on: ubuntu-latest
     # Only executes next steps if Source branch name starts with develop
     if: (startswith(${{inputs.sourceBranch}},'feature') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'feature/')))
@@ -60,7 +60,6 @@ jobs:
         with:
           issue-number: ${{github.event.pull_request.number}}
           body: |
-            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
