@@ -28,16 +28,16 @@ on:
         - PRODUCTION
       
   # Pull request trigger
-  # pull_request:
-  #   types: [opened, synchronize]
-  #   branches:
-  #     - develop
-  #     - integration
-  #     - release
-  #     - "integration/**"
-  #     - "release/**"
-  #   paths-ignore:
-  #     - "**/README.md"
+#   pull_request:
+#     types: [opened, synchronize]
+#     branches:
+#       - develop
+#       - int
+#       - release
+#       - "integration/**"
+#       - "release/**"
+#     paths-ignore:
+#       - "**/README.md"
 
 # Environment Variables
 env:
@@ -79,16 +79,16 @@ jobs:
       # check env and branch
       - name: Check branch and env
         run: |
-          if [ "${{ github.event.inputs.environment }}" == "CI" ] && [ "${{ github.ref }}" != "refs/heads/develop" ]; then
+          if [ "${{ env.TARGET_ENVIRONMNET }}" == "CI" ] && [ "${{ inputs.targetBranch }}" != "develop" ]; then
             echo "Error: CI environment can only be used with develop"
             exit 1
-          elif [ "${{ github.event.inputs.environment }}" == "SIT" ] && [ "${{ github.ref }}" != "refs/heads/int" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "SIT" ] && [ "${{ inputs.targetBranch }}" != "int" ]; then
             echo "Error: SIT environment can only be used with int branch"
             exit 1
-          elif [ "${{ github.event.inputs.environment }}" == "UAT" ] && [ "${{ github.ref }}" != "refs/heads/releases" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "UAT" ] && [ "${{ inputs.targetBranch }}" != "releases" ]; then
             echo "Error: UAT environment can only be used with releases branch"
             exit 1
-          elif [ "${{ github.event.inputs.environment }}" == "PROD" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "PROD" ] && [ "${{ inputs.targetBranch }}" != "main" ]; then
             echo "Error: PROD environment can only be used with main branch"
             exit 1
           fi
@@ -97,13 +97,13 @@ jobs:
       - name: Enviornment CHECK
         run: |
           # You can use different secrets from each environment and handle exceptions like this:
-          if [ "${{ github.event.inputs.environment }}" == "CI" ]; then
+          if [ "${{ env.TARGET_ENVIRONMNET }}" == "CI" ]; then
             echo "Using secrets from CI environment: ${{ secrets.HELLO }}, ${{ secrets.TEST_SECRET }}"
-          elif [ "${{ github.event.inputs.environment }}" == "SIT" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "SIT" ]; then
             echo "Using secrets from SIT environment: ${{ secrets.HELLO2SIT }}, ${{ secrets.SIT }}"
-          elif [ "${{ github.event.inputs.environment }}" == "UAT" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "UAT" ]; then
             echo "Using secrets from UAT environment: ${{ secrets.HELLO2UAT }}, ${{ secrets.UAT }}"
-          elif [ "${{ github.event.inputs.environment }}" == "PROD" ]; then
+          elif [ "${{ env.TARGET_ENVIRONMNET }}" == "PROD" ]; then
             echo "Using secrets from PROD environment: ${{ secrets.HELLO2PROD }}, ${{ secrets.PROD }}"
           else
             echo "Error: Invalid environment selected"
