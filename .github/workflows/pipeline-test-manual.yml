@@ -54,39 +54,6 @@ jobs:
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
     steps:
-      # Create a PR comment thread
-      - name: Create PR comment Thread
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{github.event.pull_request.number}}
-          body: |
-            ## **Starting build #[${{github.run_number}}][1]**
-            ------
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Find comments in PR
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        id: lastComment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          direction: last
-
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: pending
-          repository: ${{ github.repository }}
-          context: Build ${{github.run_number}}
-          description: "Build #${{github.run_number}} Started. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Save PR number in PR_RUN text file
       - name: Save the PR number
         if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
@@ -191,17 +158,6 @@ jobs:
           sudo apt-get install -y git
           git --version
 
-      # Update comment in PR Thread: OS dependencies installed
-      - name: Update Comment Thread - Dependencies installed
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        id: message_body
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            + All dependencies installed
-
       # check env
       - name: Enviornment CHECK
         run: |
@@ -218,25 +174,3 @@ jobs:
             echo "Error: Invalid environment selected"
             exit 1
           fi
-
-
-      # Set Pull Request Status
-      - name: Set PR Status
-        if: ((steps.vlocityDeploySIT.outcome == 'failure' || steps.vlocityDeploySIT.outcome == 'failure') && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'))
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Build #${{github.run_number}} succesfully ends. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Approve PR to merge
-      - name: Approve Pull Request
-        if: ((steps.vlocityDeploySIT.outcome == 'success' || steps.sfdxDeploySIT.outcome == 'success' || steps.sfdxQuickDeploySIT.outcome == 'success' || steps.vlocityDeployUAT.outcome == 'success' || steps.sfdxDeployUAT.outcome == 'success' || steps.sfdxQuickDeployUAT.outcome == 'success') && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'))
-        uses: juliangruber/approve-pull-request-action@v2.0.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{github.event.pull_request.number}}
