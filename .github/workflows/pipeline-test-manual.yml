@@ -56,42 +56,6 @@ jobs:
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
     steps:
-      # Save PR number in PR_RUN text file
-      - name: Save the PR number
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        shell: bash
-        env:
-          PR_NUM: ${{ github.event.number }}
-        run: |
-          echo $PR_NUM > pr_num.txt
-
-      # Upload PR number
-      - name: Upload Artifact PR number
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        uses: actions/upload-artifact@v3
-        with:
-          name: pr_num
-          path: ./pr_num.txt
-          retention-days: 15
-
-      # Save source branch of PR
-      - name: Save the source branch of Pull request
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        shell: bash
-        env:
-          BRANCH_NAME: ${{ github.head_ref }}
-        run: |
-          echo $BRANCH_NAME > branch_name.txt
-
-      # Upload the source branch of Pull request
-      - name: Upload Artifact source branch of Pull request
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        uses: actions/upload-artifact@v3
-        with:
-          name: branch_name
-          path: ./branch_name.txt
-          retention-days: 15
-
       # Checkout the current repository
       - name: Checkout Repository
         uses: actions/checkout@v3
