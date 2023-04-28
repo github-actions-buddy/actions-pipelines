@@ -1,4 +1,4 @@
-name: Pipeline CI to SIT OR UAT
+name: Pipeline CI
 
 # Workflow run name
 run-name: Workflow run No - {{ github.run_number }} by @${{ github.actor }}
@@ -21,20 +21,21 @@ on:
         type: choice
         required: true
         options:
-        - SIT
+        - CI
         - UAT
         - PRODUCTION
       
   # Pull request trigger
-  pull_request:
-    types: [opened, synchronize]
-    branches:
-      - integration
-      - release
-      - "integration/**"
-      - "release/**"
-    paths-ignore:
-      - "**/README.md"
+  # pull_request:
+  #   types: [opened, synchronize]
+  #   branches:
+  #     - develop
+  #     - integration
+  #     - release
+  #     - "integration/**"
+  #     - "release/**"
+  #   paths-ignore:
+  #     - "**/README.md"
 
 # Environment Variables
 env:
@@ -46,47 +47,13 @@ env:
   TARGET_ENVIRONMNET: ${{ inputs.targetEnv }}
 
 jobs:
-  installation_authenticate_deploy:
+  test_job:
     runs-on: ubuntu-latest
     # Only executes next steps if Source branch name starts with develop
-    if: (startswith(${{inputs.sourceBranch}},'develop') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'develop/')))
+    if: (startswith(${{inputs.sourceBranch}},'feature') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'feature/')))
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
     steps:
-      # Create a PR comment thread
-      - name: Create PR comment Thread
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{github.event.pull_request.number}}
-          body: |
-            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
-            ## **Starting build #[${{github.run_number}}][1]**
-            ------
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Find comments in PR
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        id: lastComment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          direction: last
-
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: pending
-          repository: ${{ github.repository }}
-          context: Build ${{github.run_number}}
-          description: "Build #${{github.run_number}} Started. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Save PR number in PR_RUN text file
       - name: Save the PR number
         if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
@@ -103,7 +70,7 @@ jobs:
         with:
           name: pr_num
           path: ./pr_num.txt
-          retention-days: 30
+          retention-days: 15
 
       # Save source branch of PR
       - name: Save the source branch of Pull request
@@ -121,31 +88,17 @@ jobs:
         with:
           name: branch_name
           path: ./branch_name.txt
-          retention-days: 30
+          retention-days: 15
 
       # Checkout the current repository
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      # Install required OS packages
-      - name: Install OS dependencies
-        run: |
-          sudo apt-get clean -y
-          sudo apt-get update -y
-          sudo apt --only-upgrade install -y zip
-          sudo apt --only-upgrade install -y curl
-          sudo apt --only-upgrade install -y wget
-          sudo apt install openjdk-8-jdk -y
-          sudo apt --only-upgrade install jq -y
-          sudo apt --only-upgrade install grep -y
-          sudo apt autoremove -y
 
       # Setup python v3.7
       - uses: actions/setup-python@v4
         name: Install Python v3.7 and cache pip
         with:
           python-version: "3.7"
-          cache: "pip" # caching pip dependencies
 
       # Checking out repo before installing Node
       - uses: actions/checkout@v3
@@ -157,41 +110,6 @@ jobs:
         with:
           node-version: "18"
 
-      # Install the SFDX-CLI
-      - name: Install SFDX-CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-          mkdir ~/sfdx && ls -la
-          tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-          echo "$HOME/sfdx/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/sfdx/bin/sfdx version
-
-      # Install SFDX-Scanner
-      - name: Install SFDX-Scanner
-        run: |
-          sfdx plugins:install @salesforce/sfdx-scanner
-
-      # Checkout acct-scripts repo
-      - name: Checkout Python_Scripts
-        uses: actions/checkout@v3
-        with:
-          repository: AlticeGroupIT/acct-scripts
-          token: ${{ secrets.V_METADATA_SEC }}
-          path: ./acct-scripts
-
-      # Install Puppeteer
-      - name: Install Puppeteer
-        run: |
-          ls -l
-          npm install puppeteer -g
-
-      # Install Vlocity
-      - name: Install Vlocity
-        run: |
-          npm install --global vlocity
-          vlocity --version
-
       # Install Git
       - name: Install Git
         run: |
@@ -199,34 +117,19 @@ jobs:
           sudo apt-get install -y git
           git --version
 
-      # Update comment in PR Thread: OS dependencies installed
-      - name: Update Comment Thread - Dependencies installed
-        if: ${{github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'}}
-        id: message_body
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            + All dependencies installed
-
-      # Set Pull Request Status
-      - name: Set PR Status
-        if: ((steps.vlocityDeploySIT.outcome == 'failure' || steps.vlocityDeploySIT.outcome == 'failure') && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'))
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Build #${{github.run_number}} succesfully ends. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Approve PR to merge
-      - name: Approve Pull Request
-        if: ((steps.vlocityDeploySIT.outcome == 'success' || steps.sfdxDeploySIT.outcome == 'success' || steps.sfdxQuickDeploySIT.outcome == 'success' || steps.vlocityDeployUAT.outcome == 'success' || steps.sfdxDeployUAT.outcome == 'success' || steps.sfdxQuickDeployUAT.outcome == 'success') && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'))
-        uses: juliangruber/approve-pull-request-action@v2.0.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{github.event.pull_request.number}}
+      # check env
+      - name: Enviornment CHECK
+        run: |
+          # You can use different secrets from each environment and handle exceptions like this:
+          if [ "${{ github.event.inputs.environment }}" == "CI" ]; then
+            echo "Using secrets from Test_Deploy environment: ${{ secrets.HELLO }}, ${{ secrets.WELCOME }}, ${{ secrets.DEPLOY }}"
+          elif [ "${{ github.event.inputs.environment }}" == "SIT" ]; then
+            echo "Using secrets from SIT environment: ${{ secrets.HELLO2SIT }}, ${{ secrets.SIT }}"
+          elif [ "${{ github.event.inputs.environment }}" == "UAT" ]; then
+            echo "Using secrets from UAT environment: ${{ secrets.HELLO2UAT }}, ${{ secrets.UAT }}"
+          elif [ "${{ github.event.inputs.environment }}" == "PROD" ]; then
+            echo "Using secrets from PROD environment: ${{ secrets.HELLO2PROD }}, ${{ secrets.PROD }}"
+          else
+            echo "Error: Invalid environment selected"
+            exit 1
+          fi
