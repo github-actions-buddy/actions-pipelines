@@ -26,16 +26,16 @@ on:
         - PRODUCTION
       
   # Pull request trigger
-  pull_request:
-    types: [opened, synchronize]
-    branches:
-      - develop
-      - integration
-      - release
-      - "integration/**"
-      - "release/**"
-    paths-ignore:
-      - "**/README.md"
+  # pull_request:
+  #   types: [opened, synchronize]
+  #   branches:
+  #     - develop
+  #     - integration
+  #     - release
+  #     - "integration/**"
+  #     - "release/**"
+  #   paths-ignore:
+  #     - "**/README.md"
 
 # Environment Variables
 env:
@@ -94,19 +94,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Install required OS packages
-      - name: Install OS dependencies
-        run: |
-          sudo apt-get clean -y
-          sudo apt-get update -y
-          sudo apt --only-upgrade install -y zip
-          sudo apt --only-upgrade install -y curl
-          sudo apt --only-upgrade install -y wget
-          sudo apt install openjdk-8-jdk -y
-          sudo apt --only-upgrade install jq -y
-          sudo apt --only-upgrade install grep -y
-          sudo apt autoremove -y
-
       # Setup python v3.7
       - uses: actions/setup-python@v4
         name: Install Python v3.7 and cache pip
@@ -122,33 +109,6 @@ jobs:
         name: Install Node v18
         with:
           node-version: "18"
-
-      # Install the SFDX-CLI
-      - name: Install SFDX-CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-          mkdir ~/sfdx && ls -la
-          tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-          echo "$HOME/sfdx/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/sfdx/bin/sfdx version
-
-      # Install SFDX-Scanner
-      - name: Install SFDX-Scanner
-        run: |
-          sfdx plugins:install @salesforce/sfdx-scanner
-
-      # Install Puppeteer
-      - name: Install Puppeteer
-        run: |
-          ls -l
-          npm install puppeteer -g
-
-      # Install Vlocity
-      - name: Install Vlocity
-        run: |
-          npm install --global vlocity
-          vlocity --version
 
       # Install Git
       - name: Install Git
