@@ -118,12 +118,29 @@ jobs:
           sudo apt-get install -y git
           git --version
 
+      # check env and branch
+      - name: Check branch and env
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "CI" ] && [ "${{ github.ref }}" != "refs/heads/Deploy" ]; then
+            echo "Error: CI environment can only be used with develop"
+            exit 1
+          elif [ "${{ github.event.inputs.environment }}" == "SIT" ] && [ "${{ github.ref }}" != "refs/heads/int" ]; then
+            echo "Error: SIT environment can only be used with int branch"
+            exit 1
+          elif [ "${{ github.event.inputs.environment }}" == "UAT" ] && [ "${{ github.ref }}" != "refs/heads/releases" ]; then
+            echo "Error: UAT environment can only be used with releases branch"
+            exit 1
+          elif [ "${{ github.event.inputs.environment }}" == "PROD" ] && [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "Error: PROD environment can only be used with main branch"
+            exit 1
+          fi
+
       # check env
       - name: Enviornment CHECK
         run: |
           # You can use different secrets from each environment and handle exceptions like this:
           if [ "${{ github.event.inputs.environment }}" == "CI" ]; then
-            echo "Using secrets from Test_Deploy environment: ${{ secrets.HELLO }}, ${{ secrets.WELCOME }}, ${{ secrets.DEPLOY }}"
+            echo "Using secrets from CI environment: ${{ secrets.HELLO }}, ${{ secrets.TEST_SECRET }}
           elif [ "${{ github.event.inputs.environment }}" == "SIT" ]; then
             echo "Using secrets from SIT environment: ${{ secrets.HELLO2SIT }}, ${{ secrets.SIT }}"
           elif [ "${{ github.event.inputs.environment }}" == "UAT" ]; then
