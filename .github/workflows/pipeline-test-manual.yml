@@ -1,7 +1,7 @@
 name: Pipeline CI
 
 # Workflow run name
-run-name: Workflow run No - {{ github.run_number }} by @${{ github.actor }}
+run-name: Workflow run No - {{ GITHUB_RUN_NUMBER }} by @${{ github.actor }}
 
 # Workflow triggers
 on:
