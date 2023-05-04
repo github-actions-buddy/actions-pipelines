@@ -121,8 +121,7 @@ jobs:
       - name: Read vlocityDiff
         id: get_vlocityDiff
         run: |
-          cd ./vlocityDiff.txt && ls -la
-          vlocityDiff=$(cat vlocityDiff.txt)
+          vlocityDiff=$(cat ./vlocityDiff.txt)
           echo "$vlocityDiff"
           echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_OUTPUT
 
