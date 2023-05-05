@@ -89,7 +89,7 @@ jobs:
 
       # check flg
       - name: Check FLG
-        if: ${{env.CHECK_FLG == true}}
+        if: ${{env.CHECK_FLG}} == 'true'
         run: |
           echo "FLAG IS ON"
 
