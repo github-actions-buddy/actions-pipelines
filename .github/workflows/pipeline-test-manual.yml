@@ -18,11 +18,10 @@ on:
       checkBranch:
         description: "Check Branch"
         required: true
-        default: false
         type: boolean
       targetEnv:
-        description: 'Target Environment for Deployment'
-        default: 'None'
+        description: "Target Environment for Deployment"
+        default: "None"
         type: choice
         required: true
         options:
