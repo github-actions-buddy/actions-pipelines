@@ -1,7 +1,7 @@
 name: Pipeline CI
 
 # Workflow run name
-run-name: Workflow run No - {{ github.run_number }} by @${{ github.actor }}
+run-name: Workflow run No - ${{ github.run_number }} by @${{ github.actor }}
 
 # Workflow triggers
 on:
@@ -28,16 +28,16 @@ on:
         - PRODUCTION
       
   # Pull request trigger
-  # pull_request:
-  #   types: [opened, synchronize]
-  #   branches:
-  #     - develop
-  #     - integration
-  #     - release
-  #     - "integration/**"
-  #     - "release/**"
-  #   paths-ignore:
-  #     - "**/README.md"
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+      - integration
+      - release
+      - "integration/**"
+      - "release/**"
+    paths-ignore:
+      - "**/README.md"
 
 # Environment Variables
 env:
@@ -52,7 +52,7 @@ jobs:
   test_job:
     runs-on: ubuntu-latest
     # Only executes next steps if Source branch name starts with develop
-    if: (startswith(${{inputs.sourceBranch}},'feature') || (github.event_name == 'workflow_dispatch' && contains(github.ref, 'feature/')))
+    if: (startswith(${{inputs.sourceBranch}},'feature') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') && contains(github.ref, 'feature/')))
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
     steps:
