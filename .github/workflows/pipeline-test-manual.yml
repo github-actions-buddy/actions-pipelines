@@ -85,7 +85,7 @@ jobs:
       - name: Create PR comment Thread
         uses: peter-evans/create-or-update-comment@v2
         with:
-          issue-number: ${{env.PR_NUMBER}}
+          issue-number: env.PR_NUMBER
           body: |
             ## **Starting build #[${{github.run_number}}][1]**
             ------
@@ -97,7 +97,7 @@ jobs:
         uses: peter-evans/find-comment@v2
         id: lastComment
         with:
-          issue-number: ${{ env.PR_NUMBER }}
+          issue-number: env.PR_NUMBER
           comment-author: "github-actions[bot]"
           direction: last
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -121,7 +121,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{env.PR_NUMBER }}
+          issue-number: env.PR_NUMBER
           body: |
             + Installation Success :white_check_mark:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{env.PR_NUMBER }}
+          issue-number: env.PR_NUMBER
           body: |
             + Git Config Complete :white_check_mark:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -178,7 +178,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{env.PR_NUMBER }}
+          issue-number: env.PR_NUMBER
           body: |
             + Git Check Complete :white_check_mark:
           token: ${{ secrets.GITHUB_TOKEN }}
