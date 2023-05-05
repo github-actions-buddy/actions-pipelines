@@ -95,7 +95,7 @@ jobs:
           echo "FLAG IS ON"
       # check flg
       - name: Check FLG
-        if: env.CHECK_FLG == 'false')
+        if: env.CHECK_FLG == 'false'
         run: |
           echo "FLAG IS OFF"
 
