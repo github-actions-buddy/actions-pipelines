@@ -90,6 +90,7 @@ jobs:
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Find comments in PR
       - name: Find Comment
