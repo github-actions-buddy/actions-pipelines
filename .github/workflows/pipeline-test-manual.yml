@@ -20,6 +20,10 @@ on:
         required: true
         default: false
         type: boolean
+      pullRequestNumber:
+        description: "Enter Pull Request Number"
+        required: true
+        type: number
       targetEnv:
         description: "Target Environment for Deployment"
         default: "None"
@@ -61,6 +65,7 @@ jobs:
       CHECK_FLG: ${{inputs.checkFLG}}
       SOURCE_BRANCH: ${{inputs.sourceBranch}}
       TARGET_BRANCH: ${{inputs.targetBranch}}
+      PR_NUMBER: ${{inputs.pullRequestNumber}}
     steps:
       # Checkout the current repository
       - name: Checkout Repository
@@ -75,6 +80,25 @@ jobs:
       # Checking out repo before installing Node
       - uses: actions/checkout@v3
         name: Checkout Repository
+      
+      # Create a PR comment thread
+      - name: Create PR comment Thread
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{env.PR_NUMBER}}
+          body: |
+            ## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # Find comments in PR
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: lastComment
+        with:
+          issue-number: ${{ env.PR_NUMBER }}
+          comment-author: "github-actions[bot]"
+          direction: last
 
       # Setup Node v14
       - uses: actions/setup-node@v3
@@ -88,6 +112,17 @@ jobs:
           sudo apt update
           sudo apt-get install -y git
           git --version
+
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        if: (github.event_name == 'workflow_dispatch')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{env.PR_NUMBER }}
+          body: |
+            + Installation Success :white_check_mark:
+
       # Configure a global user for Git
       - name: Configure Global User for Git
         run: |
@@ -96,6 +131,16 @@ jobs:
           git config --global diff.renameLimit 5000
           git config core.quotepath off
           git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+      
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        if: (github.event_name == 'workflow_dispatch')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{env.PR_NUMBER }}
+          body: |
+            + Git Config Complete :white_check_mark:
           
       # echo
       - name: Echo
@@ -122,6 +167,16 @@ jobs:
           git branch -a
           git checkout ${{ env.TARGET_BRANCH }}
           git checkout ${{ env.SOURCE_BRANCH }}
+
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        if: (github.event_name == 'workflow_dispatch')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{env.PR_NUMBER }}
+          body: |
+            + Git Check Complete :white_check_mark:
 
       # check env and branch
       - name: Check branch and env
