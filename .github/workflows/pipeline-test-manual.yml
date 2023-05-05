@@ -32,16 +32,16 @@ on:
         - PRODUCTION
       
   # Pull request trigger
-  pull_request:
-    types: [opened, synchronize]
-    branches:
-      - develop
-      - integration
-      - release
-      - "integration/**"
-      - "release/**"
-    paths-ignore:
-      - "**/README.md"
+  # pull_request:
+  #   types: [opened, synchronize]
+  #   branches:
+  #     - develop
+  #     - integration
+  #     - release
+  #     - "integration/**"
+  #     - "release/**"
+  #   paths-ignore:
+  #     - "**/README.md"
 
 # Environment Variables
 env:
