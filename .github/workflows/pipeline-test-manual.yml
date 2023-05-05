@@ -86,11 +86,11 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{env.PR_NUMBER}}
+          token: ${{ secrets.MY_PAT }}
           body: |
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          token: ${{ secrets.MY_PAT }}
 
       # Find comments in PR
       - name: Find Comment
@@ -98,7 +98,7 @@ jobs:
         id: lastComment
         with:
           issue-number: ${{env.PR_NUMBER}}
-          comment-author: "github-actions[bot]"
+          comment-author: 'github-actions[bot]'
           direction: last
           token: ${{ secrets.MY_PAT }}
 
