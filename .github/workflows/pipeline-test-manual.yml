@@ -95,6 +95,7 @@ jobs:
           git config --global user.name ${{ env.GIT_USER_EMAIL }}
           git config --global diff.renameLimit 5000
           git config core.quotepath off
+          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
           
       # echo
       - name: Echo
