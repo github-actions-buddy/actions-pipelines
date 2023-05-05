@@ -22,7 +22,7 @@ on:
         type: boolean
       pullRequestNumber:
         description: "Enter Pull Request Number"
-        required: true
+        required: false
         type: number
       targetEnv:
         description: "Target Environment for Deployment"
