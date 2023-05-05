@@ -75,6 +75,12 @@ jobs:
         name: Install Node v18
         with:
           node-version: "18"
+          
+      # echo
+      - name: Echo
+        run: |
+          echo "Head Ref: ${{github.head_ref}}"
+          echo "Base Ref: ${{github.base_ref}}"
 
       # check env and branch
       - name: Check branch and env
