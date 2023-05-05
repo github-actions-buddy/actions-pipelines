@@ -18,6 +18,7 @@ on:
       checkFLG:
         description: "Check Branch"
         required: true
+        default: false
         type: boolean
       targetEnv:
         description: "Target Environment for Deployment"
