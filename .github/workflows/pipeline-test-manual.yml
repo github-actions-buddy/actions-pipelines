@@ -61,6 +61,8 @@ jobs:
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
       CHECK_FLG: ${{inputs.checkFLG}}
+      SOURCE_BRANCH: ${{inputs.sourceBranch}}
+      TARGET_BRANCH: ${{inputs.targetBranch}}
     steps:
       # Checkout the current repository
       - name: Checkout Repository
@@ -90,14 +92,20 @@ jobs:
 
       # check flg
       - name: Check FLG
-        if: env.CHECK_FLG == "true"
+        if: env.CHECK_FLG == 'true'
         run: |
           echo "FLAG IS ON"
       # check flg
       - name: Check FLG
-        if: env.CHECK_FLG == "false"
+        if: env.CHECK_FLG == 'false'
         run: |
           echo "FLAG IS OFF"
+
+      #git
+      - name: Git Check
+        run:
+          git checkout ${{ env.TARGET_BRANCH }}
+          git checkout ${{ env.SOURCE_BRANCH }}
 
       # check env and branch
       - name: Check branch and env
