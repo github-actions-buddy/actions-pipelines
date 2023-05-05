@@ -15,7 +15,7 @@ on:
         description: "Target Branch"
         required: true
         type: string
-      checkBranch:
+      checkFLG:
         description: "Check Branch"
         required: true
         type: boolean
@@ -32,16 +32,16 @@ on:
         - PRODUCTION
       
   # Pull request trigger
-  # pull_request:
-  #   types: [opened, synchronize]
-  #   branches:
-  #     - develop
-  #     - integration
-  #     - release
-  #     - "integration/**"
-  #     - "release/**"
-  #   paths-ignore:
-  #     - "**/README.md"
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+      - integration
+      - release
+      - "integration/**"
+      - "release/**"
+    paths-ignore:
+      - "**/README.md"
 
 # Environment Variables
 env:
@@ -59,7 +59,7 @@ jobs:
     if: (startswith(${{inputs.sourceBranch}},'feature') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') && contains(github.ref, 'feature/')))
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
-      CHECK_FLG: ${{inputs.checkBranch}}
+      CHECK_FLG: ${{inputs.checkFLG}}
     steps:
       # Checkout the current repository
       - name: Checkout Repository
@@ -89,12 +89,12 @@ jobs:
 
       # check flg
       - name: Check FLG
-        if: (${{env.CHECK_FLG}} == true)
+        if: ("${{env.CHECK_FLG}}" == "true")
         run: |
           echo "FLAG IS ON"
       # check flg
       - name: Check FLG
-        if: (${{env.CHECK_FLG}} == false)
+        if: ("${{env.CHECK_FLG}}" == "false")
         run: |
           echo "FLAG IS OFF"
 
