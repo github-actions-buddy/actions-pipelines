@@ -15,6 +15,10 @@ on:
         description: "Target Branch"
         required: true
         type: string
+      checkBranch:
+        description: "Check Branch"
+        required: true
+        type: boolean
       targetEnv:
         description: 'Target Environment for Deployment'
         default: 'None'
