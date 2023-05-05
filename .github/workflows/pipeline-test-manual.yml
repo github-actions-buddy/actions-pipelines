@@ -59,6 +59,7 @@ jobs:
     if: (startswith(${{inputs.sourceBranch}},'feature') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') && contains(github.ref, 'feature/')))
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
+      CHECK_FLG: ${{inputs.checkBranch}}
     steps:
       # Checkout the current repository
       - name: Checkout Repository
@@ -85,6 +86,12 @@ jobs:
         run: |
           echo "Head Ref: ${{github.head_ref}}"
           echo "Base Ref: ${{github.base_ref}}"
+
+      # check flg
+      - name: Check FLG
+        if: ${{env.CHECK_FLG == true}}
+        run: |
+          echo "FLAG IS ON"
 
       # check env and branch
       - name: Check branch and env
