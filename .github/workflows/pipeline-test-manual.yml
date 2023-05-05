@@ -90,7 +90,7 @@ jobs:
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_PAT }}
 
       # Find comments in PR
       - name: Find Comment
@@ -100,7 +100,7 @@ jobs:
           issue-number: ${{env.PR_NUMBER}}
           comment-author: "github-actions[bot]"
           direction: last
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_PAT }}
 
       # Setup Node v14
       - uses: actions/setup-node@v3
@@ -124,7 +124,7 @@ jobs:
           issue-number: ${{env.PR_NUMBER}}
           body: |
             + Installation Success :white_check_mark:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_PAT }}
 
       # Configure a global user for Git
       - name: Configure Global User for Git
@@ -144,7 +144,7 @@ jobs:
           issue-number: ${{env.PR_NUMBER}}
           body: |
             + Git Config Complete :white_check_mark:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_PAT }}
           
       # echo
       - name: Echo
@@ -180,7 +180,7 @@ jobs:
           issue-number: ${{env.PR_NUMBER}}
           body: |
             + Git Check Complete :white_check_mark:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_PAT }}
 
       # check env and branch
       - name: Check branch and env
