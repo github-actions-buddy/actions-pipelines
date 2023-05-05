@@ -117,6 +117,7 @@ jobs:
       - name: Git Check
         run: |
           git fetch --all
+          git branch -a
           git checkout ${{ env.TARGET_BRANCH }}
           git checkout ${{ env.SOURCE_BRANCH }}
 
