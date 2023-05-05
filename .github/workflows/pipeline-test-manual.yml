@@ -84,6 +84,7 @@ jobs:
       # Create a PR comment thread
       - name: Create PR comment Thread
         uses: peter-evans/create-or-update-comment@v2
+        if: env.PR_NUMBER != ''
         with:
           issue-number: ${{env.PR_NUMBER}}
           token: ${{ secrets.MY_PAT }}
@@ -96,6 +97,7 @@ jobs:
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: lastComment
+        if: env.PR_NUMBER != ''
         with:
           issue-number: ${{env.PR_NUMBER}}
           comment-author: 'github-actions[bot]'
@@ -117,7 +119,7 @@ jobs:
 
       # Update a comment in PR Thread
       - name: Update Comment Thread - Delta Package-Not Built
-        if: (github.event_name == 'workflow_dispatch')
+        if: (github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
@@ -137,7 +139,7 @@ jobs:
       
       # Update a comment in PR Thread
       - name: Update Comment Thread - Delta Package-Not Built
-        if: (github.event_name == 'workflow_dispatch')
+        if: (github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
@@ -175,6 +177,7 @@ jobs:
       # Update a comment in PR Thread
       - name: Update Comment Thread - Delta Package-Not Built
         uses: peter-evans/create-or-update-comment@v2
+        if: env.PR_NUMBER != ''
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{env.PR_NUMBER}}
