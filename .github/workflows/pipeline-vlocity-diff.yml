@@ -49,7 +49,10 @@ jobs:
         if: (steps.get_vlocityDiff.outcome == 'success')
         run: |
           # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
+          if grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
+            echo "::error::No Changes Detected"
+            exit 1
+          elif grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
             echo "SUCCESS!!!"
           elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
@@ -57,9 +60,6 @@ jobs:
             echo "::error::FAILED!!!"
             # If the exit status of the grep command is non-zero (false), execute this branch
             echo "::error::Maintenance jobs run was failed"
-          elif grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
-            echo "::error::No Changes Detected"
-            exit 1
           fi
 
       # Clean up downloaded directories
