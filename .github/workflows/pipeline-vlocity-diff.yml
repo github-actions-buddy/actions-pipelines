@@ -52,7 +52,9 @@ jobs:
           if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
             echo "SUCCESS!!!"
-          else
+          elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
+            # If the exit status of the grep command is 0 (true), execute this branch
+            echo "::error::FAILED!!!"
             # If the exit status of the grep command is non-zero (false), execute this branch
             echo "::error::Maintenance jobs run was failed"
           fi
