@@ -169,7 +169,7 @@ jobs:
         if: (steps.get_vlocityDiff.outcome == 'success')
         run: |
           # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ${{env.outvlocityDiff}}; then
+          if grep -Eq "vlocity/(Product2|Catalog)/.*" env.outvlocityDiff; then
             # If the exit status of the grep command is 0 (true), execute this branch
             ./vlocity/apex/CatalogAndProductJob.cls
             if [ $? -eq 0 ]; then
