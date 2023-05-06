@@ -39,7 +39,7 @@ jobs:
       - name: Read vlocityDiff
         id: get_vlocityDiff
         run: |
-          vlocityDiff=$(cat ./vlocityDiff.txt)
+          vlocityDiff=$(cat ./vlocityDiff-2.txt)
           echo "$vlocityDiff"
           # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
           # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
@@ -49,10 +49,10 @@ jobs:
         if: (steps.get_vlocityDiff.outcome == 'success')
         run: |
           # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
+          if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
             echo "SUCCESS!!!"
-          elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
+          elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
             echo "::error::FAILED!!!"
             # If the exit status of the grep command is non-zero (false), execute this branch
