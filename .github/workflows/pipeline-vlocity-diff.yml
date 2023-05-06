@@ -121,11 +121,10 @@ jobs:
       - name: Read vlocityDiff
         id: get_vlocityDiff
         run: |
-          vlocityDiff=$(cat ./vlocityDiff.txt)
-          echo "$vlocityDiff"
-          echo "outvlocityDiff<<$vlocityDiff" >> $GITHUB_ENV
-          # echo "outvlocityDiff=$vlocityDiff" >> "$GITHUB_OUTPUT"
-          # content=$(cat path/to/file.txt)
+          # vlocityDiff=$(cat ./vlocityDiff.txt)
+          vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
+          echo "vlocityDiff"
+          echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
 
       # Install Vlocity
       - name: Install Vlocity
