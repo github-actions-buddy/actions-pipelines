@@ -40,7 +40,7 @@ jobs:
         id: get_vlocityDiff
         run: |
           vlocityDiff=$(cat ./vlocityDiff.txt)
-          echo "vlocityDiff"
+          echo "$vlocityDiff"
           # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
           # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
 
