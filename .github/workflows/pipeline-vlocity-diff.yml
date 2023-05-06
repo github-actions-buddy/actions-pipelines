@@ -57,7 +57,7 @@ jobs:
             echo "::error::FAILED!!!"
             # If the exit status of the grep command is non-zero (false), execute this branch
             echo "::error::Maintenance jobs run was failed"
-          elif grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; the
+          elif grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
             echo "::error::No Changes Detected"
             exit 1
           fi
