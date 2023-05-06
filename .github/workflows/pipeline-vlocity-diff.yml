@@ -39,17 +39,17 @@ jobs:
       - name: Read vlocityDiff
         id: get_vlocityDiff
         run: |
-          # vlocityDiff=$(cat ./vlocityDiff.txt)
-          vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
+          vlocityDiff=$(cat ./vlocityDiff.txt)
           echo "vlocityDiff"
-          echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
+          # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
+          # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
 
       # Deploy the difference in vlocity folder to instance
       - name: Run Maintenance Jobs
         if: (steps.get_vlocityDiff.outcome == 'success')
         run: |
           # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ${{env.outvlocityDiff}}; then
+          if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
             ./vlocity/apex/CatalogAndProductJob.cls
             if [ $? -eq 0 ]; then
