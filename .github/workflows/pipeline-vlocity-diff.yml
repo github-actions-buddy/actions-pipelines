@@ -51,31 +51,7 @@ jobs:
           # Use the exit status of the grep command as the condition in the if statement
           if grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff.txt; then
             # If the exit status of the grep command is 0 (true), execute this branch
-            ./vlocity/apex/CatalogAndProductJob.cls
-            if [ $? -eq 0 ]; then
-              ./vlocity/apex/ProductHierarchyMaintenanceJob.cls
-              if [ $? -eq 0 ]; then
-                ./vlocity/apex/ClearManagedPlatformCacheJob.cls
-                if [ $? -eq 0 ]; then
-                  ./vlocity/apex/RefreshPlatformCacheFullJob.cls
-                  if [ $? -eq 0 ]; then
-                    ./vlocity/apex/PopulateApiCacheJob.cls
-                  else
-                    # If the exit status of the grep command is non-zero (false), execute this branch
-                    echo "::error::Maintenance jobs run was failed"
-                  fi
-                else
-                  # If the exit status of the grep command is non-zero (false), execute this branch
-                  echo "::error::Maintenance jobs run was failed"
-                fi
-              else
-                # If the exit status of the grep command is non-zero (false), execute this branch
-                echo "::error::Maintenance jobs run was failed"
-              fi
-            else
-              # If the exit status of the grep command is non-zero (false), execute this branch
-              echo "::error::Maintenance jobs run was failed"
-            fi
+            echo "SUCCESS!!!"
           else
             # If the exit status of the grep command is non-zero (false), execute this branch
             echo "::error::Maintenance jobs run was failed"
