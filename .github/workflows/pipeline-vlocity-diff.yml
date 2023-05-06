@@ -123,7 +123,9 @@ jobs:
         run: |
           vlocityDiff=$(cat ./vlocityDiff.txt)
           echo "$vlocityDiff"
-          echo "outvlocityDiff=$vlocityDiff" >> "$GITHUB_OUTPUT"
+          echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
+          # echo "outvlocityDiff=$vlocityDiff" >> "$GITHUB_OUTPUT"
+          # content=$(cat path/to/file.txt)
 
       # Install Vlocity
       - name: Install Vlocity
@@ -168,7 +170,7 @@ jobs:
         if: (steps.get_vlocityDiff.outcome == 'success')
         run: |
           # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ${{steps.get_vlocityDiff.output.outvlocityDiff}}; then
+          if grep -Eq "vlocity/(Product2|Catalog)/.*" ${{env.outvlocityDiff}}; then
             # If the exit status of the grep command is 0 (true), execute this branch
             ./vlocity/apex/CatalogAndProductJob.cls
             if [ $? -eq 0 ]; then
