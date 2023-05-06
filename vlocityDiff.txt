@@ -67,13 +67,3 @@ M	vlocity/OrchestrationItemDefinition/Syncing-GlobalId_iManageSalesforce/Syncing
 M	vlocity/OrchestrationItemDefinition/Update-Account-Status_Salesforce/Update-Account-Status_DataPack.json
 M	vlocity/OrchestrationItemDefinition/Usage-Charging-Provision_Usage-Charge-Provision/Usage-Charging-Provision_DataPack.json
 M	vlocity/OrchestrationItemDefinition/Usage-Charging-Provision_Usage-Charge-Provision/Usage-Charging-Provision_ParentKeys.json
-M	vlocity/Product2/2c4c1fcb-25bc-9a42-00bb-27862dd40646/CFS-MOBILE-DATA_AttributeAssignments.json
-M	vlocity/Product2/2c4c1fcb-25bc-9a42-00bb-27862dd40646/CFS-MOBILE-DATA_DataPack.json
-M	vlocity/Product2/2c4c1fcb-25bc-9a42-00bb-27862dd40646/CFS-MOBILE-DATA_ParentKeys.json
-M	vlocity/Product2/629831cd-8f74-8190-dc04-851266a66ebf/CFS-SIM-CARD_AttributeAssignments.json
-M	vlocity/Product2/629831cd-8f74-8190-dc04-851266a66ebf/CFS-SIM-CARD_DataPack.json
-A	vlocity/Product2/629831cd-8f74-8190-dc04-851266a66ebf/CFS-SIM-CARD_ObjectFieldAttributes.json
-M	vlocity/Product2/629831cd-8f74-8190-dc04-851266a66ebf/CFS-SIM-CARD_ParentKeys.json
-M	vlocity/Product2/c75517c4-6a76-0a24-c9e4-6862518bfc62/CFS-MOBILE-ACCESS_AttributeAssignments.json
-M	vlocity/Product2/c75517c4-6a76-0a24-c9e4-6862518bfc62/CFS-MOBILE-ACCESS_DataPack.json
-M	vlocity/Product2/c75517c4-6a76-0a24-c9e4-6862518bfc62/CFS-MOBILE-ACCESS_ParentKeys.json
