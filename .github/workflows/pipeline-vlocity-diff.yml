@@ -123,7 +123,7 @@ jobs:
         run: |
           vlocityDiff=$(cat ./vlocityDiff.txt)
           echo "$vlocityDiff"
-          echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
+          echo "outvlocityDiff<<EOF$vlocityDiff" >> $GITHUB_ENV
           # echo "outvlocityDiff=$vlocityDiff" >> "$GITHUB_OUTPUT"
           # content=$(cat path/to/file.txt)
 
