@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v3.7
         with:
           # Version range or exact version
-          python-version: 3.7
+          python-version: '3.7'
       - name: Setup Python
         run: |
           pip install --upgrade argparse
