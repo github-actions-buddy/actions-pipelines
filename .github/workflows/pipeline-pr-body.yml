@@ -1,0 +1,27 @@
+name: Pipeline PR Body
+
+# Workflow run name
+run-name: Workflow run PR No - ${{ github.event.pull_request.number }} and PR title - ${{ github.event.pull_request.title }} by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+jobs:
+  pr_body:
+    runs-on: ubuntu-latest
+    # Only executes next steps if Source branch name starts with feature or defect
+    if: ((github.event_name == 'pull_request'))
+    steps:
+      
+      # Find unit tests defined in the PR Body version 2
+      - name: Find Unit Tests In Pull Request Body v2
+        if: (steps.MergerDX.outcome == 'success')
+        id: regex-match
+        run: |
+          echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
+          # python3 ./acct-scripts/readPRBody/readPRBody.py -s pullRequestBody.txt
