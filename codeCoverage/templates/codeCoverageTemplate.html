@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>codeCoverageReport</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        .fullReportStyle{
+            font-family: sans-serif;
+            margin-top: 20px;
+        }
+        .section{
+            margin-left: 125px;
+            margin-right: 125px;
+        }
+        .header{
+            /*Naranja 60*/
+            color: #ff8200;
+            font-weight: bolder;
+            margin-bottom: 9px;
+            font-size: 26px;
+        }
+        .sectionContent{
+            margin-bottom: 50px;
+        }
+        .subSection{
+            /*Turquesa 80*/
+            color: #016a7f;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .folder {
+            /*Azul 100*/
+            border-bottom: 3px solid #041e42;
+            border-color: #041e42;
+        }
+        .folder > h2 {
+            /*Azul 100*/
+            color: #041e42;
+            font-size: 18px;
+            margin: 15px 5px 0px 0px;
+        }
+        .folder:hover {
+            /*Turquesa 60*/
+            cursor: pointer;
+            background-color: #00adc3;
+        }
+        .folder > h2:first-child {
+            display: inline-flex;
+            padding-left: 10px;
+            padding-right: 5px;
+            padding-bottom: 3px;
+        }
+        .folderFiles > h2:last-child {
+            display: inline-flex;
+            float: right;
+            border-left: 2px solid;
+            padding-left: 10px;
+            padding-right: 5%;
+        }
+        .folder:hover > h2:first-child {
+            /*Turquesa 60*/
+            color: #041e42;
+        }
+        .folderFiles:hover > h2:last-child {
+            /*Turquesa 60*/
+            color: #041e42;
+            display: inline-flex;
+            border-left: 2px solid #041e42;
+        }
+        .highlightColor{
+            color: #041e42;
+            background-color: #00adc3;
+            border-left: 2px solid #041e42;
+            border-bottom: 3px solid #041e42;
+        }
+        .folder.folderFiles.darkred{
+            color: rgb(153, 0, 0);
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.orange{
+            color: orange;
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.blue{
+            color: blue;
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.red{
+            color: red;
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.yellow{
+            color: rgb(207, 197, 1);
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.almostgreen{
+            color: rgb(156, 241, 0);
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+        .folder.folderFiles.green{
+            color: green;
+            border-bottom: none;
+            border-left: 2px solid #041e42 ;
+            font-weight: bold;
+        }
+        .folder.folderFiles.onedigit{
+            padding-left: 30px;
+        }
+        input {
+            display: none;
+        }
+        label {
+            display: block;    
+            cursor: pointer;
+            transition: ease .5s;
+            margin-bottom: 0px;
+        }
+        input + label + .subSection {
+            display: none;
+        }
+        input:checked + label + .subSection {
+            display: block;
+        }
+    </style>
+</head>
+<body class="fullReportStyle">
+    <div class="section">
+        <h2 class="header">Code Coverage</h2>
+        <div class="sectionContent">
+            {% for className in mapData %}
+                <input type="checkbox" id="{{className}}" />
+                <label for="{{className}}">
+                    <div class="folder folderFiles">
+                        <h2>{{ className }}</h2>
+                        {% if mapData[className]['Percent'] < 10 %}
+                            <h2 class="folder folderFiles darkred onedigit">{{mapData[className]['Percent']}}%</h2>
+                        {% elif mapData[className]['Percent'] < 75 %}
+                            <h2 class="folder folderFiles red">{{mapData[className]['Percent']}}%</h2>
+                        {% elif mapData[className]['Percent'] > 74 and mapData[className]['Percent'] < 85  %}
+                            <h2 class="folder folderFiles orange">{{mapData[className]['Percent']}}%</h2>
+                        {% elif mapData[className]['Percent'] > 84 and mapData[className]['Percent'] < 95  %}
+                            <h2 class="folder folderFiles yellow">{{mapData[className]['Percent']}}%</h2>
+                        {% elif mapData[className]['Percent'] > 94 and mapData[className]['Percent'] < 100  %}
+                            <h2 class="folder folderFiles almostgreen">{{mapData[className]['Percent']}}%</h2>
+                        {% else %}
+                            <h2 class="folder folderFiles green">{{mapData[className]['Percent']}}%</h2>
+                        {% endif %}
+                    </div>
+                </label>
+                <div class="subSection">
+                    {% for location in mapData[className]|sort() %}
+                        {% if location == 'Lines not covered' %}
+                            {% if mapData[className]['Percent'] != 100 %}
+                                <ul>
+                                    <li>{{ location }}: <b>{{mapData[className][location]}}</b></li>
+                                </ul>
+                            {% endif %}
+                        {% else %}
+                            {% if location != "Percent" %}
+                                <ul>
+                                    <li>{{ location }}: <b>{{mapData[className][location]}}</b> </li>
+                                </ul>
+                            {% endif %} 
+                        {% endif %}
+                    {% endfor %}   
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
