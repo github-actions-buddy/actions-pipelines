@@ -1,0 +1,88 @@
+name: Scheduled workflow for DEV-CI-01 Apex Test Execution
+
+# Workflow run name
+run-name: Scheduled workflow run - ${{github.run_number}} for DEV-CI-01 Apex Test Execution
+
+# Workflow triggers
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+
+jobs:
+  test_execution_devci01:
+    runs-on: ubuntu-latest
+#     environment: DEV-CI
+    steps:
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Install required OS packages
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get clean -y
+          sudo apt-get update -y
+          sudo apt --only-upgrade install -y zip
+          sudo apt --only-upgrade install -y curl
+          sudo apt --only-upgrade install jq -y
+          sudo apt --only-upgrade install grep -y
+          sudo apt autoremove -y
+
+      # Checking out repo before installing Node
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+
+      # Setup Node v18
+      - uses: actions/setup-node@v3
+        name: Install Node v18
+        with:
+          node-version: "18"
+      
+      # Install Python v3.7
+      - uses: actions/setup-python@v4
+        name: Install Python v3.7 and cache pip
+        with:
+          python-version: "3.7"
+      
+      # Install requirements.txt from acct-scripts
+      - name: Install requirements.txt
+        run: |
+          ls -l
+          python --version
+          pip --version
+          python3 -m pip install -r "./requirements.txt"
+
+      # Get current date
+      - name: Get current date
+        id: date
+        run: |
+          echo "buildDate"=$(date +'%d-%B-%Y') >> $GITHUB_OUTPUT
+      
+      # Run tests on DEV-CI All tests in Org, except the ones that originate from installed managed packages
+      - name: Run Apex Tests in the Org
+        id: testExecution
+        run: |
+           > test_results_CI_${{ steps.date.outputs.buildDate }}.json
+      
+      # Checking out repo after changes
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+      
+      # Generate code coverage html report
+      - name: Generate Code-Coverage HTML report
+        run: |
+          python3 ./codeCoverage/codeCoverage.py -p test_results_CI_${{ steps.date.outputs.buildDate }}.json
+
+      # Upload artifact
+      - name: Artifact upload - test_results_date.json
+        id: testArtifact
+        if: (steps.testExecution.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          path: ./test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          retention-days: 30
