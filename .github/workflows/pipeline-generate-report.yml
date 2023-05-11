@@ -70,8 +70,8 @@ jobs:
           ls -la
       
       # Checking out repo after changes
-      - uses: actions/checkout@v3
-        name: Checkout Repository
+      # - uses: actions/checkout@v3
+      #   name: Checkout Repository
       
       # Generate code coverage html report
       - name: Generate Code-Coverage HTML report
