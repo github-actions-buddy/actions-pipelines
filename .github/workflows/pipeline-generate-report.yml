@@ -66,7 +66,7 @@ jobs:
       - name: Run Apex Tests in the Org
         id: testExecution
         run: |
-          cat ./codeCoverage/test.json > test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          cat ./codeCoverage/test.json > ./test_results_CI_${{ steps.date.outputs.buildDate }}.json
           ls -la
       
       # Checking out repo after changes
@@ -76,7 +76,7 @@ jobs:
       # Generate code coverage html report
       - name: Generate Code-Coverage HTML report
         run: |
-          python3 ./codeCoverage/codeCoverage.py -p test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          python3 ./codeCoverage/codeCoverage.py -p ./test_results_CI_${{ steps.date.outputs.buildDate }}.json
 
       # Upload artifact
       - name: Artifact upload - test_results_date.json
