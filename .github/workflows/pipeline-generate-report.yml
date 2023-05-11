@@ -66,7 +66,8 @@ jobs:
       - name: Run Apex Tests in the Org
         id: testExecution
         run: |
-           > test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          cat ./codeCoverage/test.json > test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          ls -la
       
       # Checking out repo after changes
       - uses: actions/checkout@v3
@@ -85,4 +86,14 @@ jobs:
         with:
           name: test_results_CI_${{ steps.date.outputs.buildDate }}.json
           path: ./test_results_CI_${{ steps.date.outputs.buildDate }}.json
+          retention-days: 30
+
+      # Upload artifact
+      - name: Artifact upload - test_results_date.json
+        id: testArtifact
+        if: (steps.testExecution.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-code-coverage.html
+          path: ./report-code-coverage.html
           retention-days: 30
