@@ -90,7 +90,7 @@ jobs:
 
       # Upload artifact
       - name: Artifact upload - test_results_date.json
-        id: testArtifact
+        id: testArtifact2
         if: (steps.testExecution.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
