@@ -34,6 +34,8 @@ jobs:
       # Label PR
       - name: Label PR
         uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       
       # Checkout repository
       - name: Checkout Repository
