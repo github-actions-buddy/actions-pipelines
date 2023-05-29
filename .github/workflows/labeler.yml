@@ -5,6 +5,13 @@ run-name: Workflow run no - ${{github.run_number}} for maintenance jobs by @${{ 
 
 # Workflow triggers
 on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+
   workflow_dispatch:
     inputs:
       sourceBranch:
@@ -31,36 +38,44 @@ jobs:
   run_maintenance_jobs:
     runs-on: ubuntu-latest
     steps:
+      # Label PR
+      - name: Label PR
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+      
       # Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
       # Read pr_num file
-      - name: Read vlocityDiff
-        id: get_vlocityDiff
-        run: |
-          vlocityDiff=$(cat ./vlocityDiff-2.txt)
-          echo "$vlocityDiff"
-          # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
-          # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
+      # - name: Read vlocityDiff
+      #   id: get_vlocityDiff
+      #   run: |
+      #     vlocityDiff=$(cat ./vlocityDiff-2.txt)
+      #     echo "$vlocityDiff"
+      #     # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
+      #     # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
 
       # Deploy the difference in vlocity folder to instance
-      - name: Run Maintenance Jobs
-        if: (steps.get_vlocityDiff.outcome == 'success')
-        run: |
-          # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
-            echo "::error::No Changes Detected"
-            exit 1
-          elif grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
-            # If the exit status of the grep command is 0 (true), execute this branch
-            echo "SUCCESS!!!"
-          elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
-            # If the exit status of the grep command is 0 (true), execute this branch
-            echo "::error::FAILED!!!"
-            # If the exit status of the grep command is non-zero (false), execute this branch
-            echo "::error::Maintenance jobs run was failed"
-          fi
+      # - name: Run Maintenance Jobs
+      #   if: (steps.get_vlocityDiff.outcome == 'success')
+      #   run: |
+      #     # Use the exit status of the grep command as the condition in the if statement
+      #     if grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
+      #       echo "::error::No Changes Detected"
+      #       exit 1
+      #     elif grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
+      #       # If the exit status of the grep command is 0 (true), execute this branch
+      #       echo "SUCCESS!!!"
+      #     elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
+      #       # If the exit status of the grep command is 0 (true), execute this branch
+      #       echo "::error::FAILED!!!"
+      #       # If the exit status of the grep command is non-zero (false), execute this branch
+      #       echo "::error::Maintenance jobs run was failed"
+      #     fi
 
       # Clean up downloaded directories
       - name: Clean up step
