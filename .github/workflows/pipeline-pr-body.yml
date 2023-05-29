@@ -1,0 +1,41 @@
+name: Pipeline PR Body
+
+# Workflow run name
+run-name: Workflow run PR No - ${{ github.event.pull_request.number }} and PR title - ${{ github.event.pull_request.title }} by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+#Jobs Test
+jobs:
+  pr_body:
+    runs-on: ubuntu-latest
+    # Only executes next steps if Source branch name starts with feature or defect
+    if: ((github.event_name == 'pull_request'))
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        name: Setup Python
+        with:
+          python-version: '3.7'
+
+      - name: Setup Python
+        run: |
+          pip install --upgrade argparse
+      # Find unit tests defined in the PR Body version 2
+      - name: Find Unit Tests In Pull Request Body v2
+        id: regex-match
+        run: |
+          echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
+          python3 ./readPRBody.py -s pullRequestBody.txt
+      # Print ENV PR_TESTS
+      - name: Echo PR_TESTS
+        run: echo ${{env.PR_TESTS}}

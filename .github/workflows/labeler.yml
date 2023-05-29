@@ -1,0 +1,214 @@
+name: Pipeline to run maintenance jobs
+
+# Workflow run name
+run-name: Workflow run no - ${{github.run_number}} for maintenance jobs by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+
+  workflow_dispatch:
+    inputs:
+      sourceBranch:
+        description: "Source Branch"
+        required: true
+        type: string
+      targetBranch:
+        description: "Target Branch"
+        required: true
+        type: string
+      targetEnv:
+        description: 'Target Environment for Deployment'
+        default: 'None'
+        type: choice
+        required: true
+        options:
+        - None
+        - CI
+        - SIT
+        - UAT
+        - PRODUCTION
+
+jobs:
+  run_maintenance_jobs:
+    runs-on: ubuntu-latest
+    steps:
+      # Label PR
+      - name: Label PR
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+      
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Read pr_num file
+      # - name: Read vlocityDiff
+      #   id: get_vlocityDiff
+      #   run: |
+      #     vlocityDiff=$(cat ./vlocityDiff-2.txt)
+      #     echo "$vlocityDiff"
+      #     # vlocityDiff=$(sed -z 's/\n/\\n/g' ./vlocityDiff.txt)
+      #     # echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_ENV
+
+      # Deploy the difference in vlocity folder to instance
+      # - name: Run Maintenance Jobs
+      #   if: (steps.get_vlocityDiff.outcome == 'success')
+      #   run: |
+      #     # Use the exit status of the grep command as the condition in the if statement
+      #     if grep -Eq "EXIT CODE 0" ./vlocityDiff-2.txt; then
+      #       echo "::error::No Changes Detected"
+      #       exit 1
+      #     elif grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
+      #       # If the exit status of the grep command is 0 (true), execute this branch
+      #       echo "SUCCESS!!!"
+      #     elif ! grep -Eq "vlocity/(Product2|Catalog)/.*" ./vlocityDiff-2.txt; then
+      #       # If the exit status of the grep command is 0 (true), execute this branch
+      #       echo "::error::FAILED!!!"
+      #       # If the exit status of the grep command is non-zero (false), execute this branch
+      #       echo "::error::Maintenance jobs run was failed"
+      #     fi
+
+      # Clean up downloaded directories
+      - name: Clean up step
+        run: |
+          sudo rm -rf branch_name
+          sudo rm -rf deploy.json
+          sudo rm -rf nomenclatureErrorsReport
+          sudo rm -rf pr_num
+          sudo rm -rf sfdxScannerReport.html
+          sudo rm -rf srcToDeploy.zip
+          sudo rm -rf validate.json
+          sudo rm -rf describe.log
+          ls -la
+
+      # Install required OS packages
+#       - name: Install OS dependencies
+#         run: |
+#           sudo apt-get clean -y
+#           sudo apt-get update -y
+#           sudo apt --only-upgrade install -y zip
+#           sudo apt --only-upgrade install -y curl
+#           sudo apt --only-upgrade install -y wget
+#           sudo apt install openjdk-8-jdk -y
+#           sudo apt --only-upgrade install jq -y
+#           sudo apt --only-upgrade install grep -y
+#           sudo apt autoremove -y
+
+      # Setup Node v14
+#       - uses: actions/setup-node@v3
+#         name: Install Node v18
+#         with:
+#           node-version: "18"
+
+#       # Install the SFDX-CLI
+#       - name: Install SFDX-CLI
+#         run: |
+#           wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+#           mkdir ~/sfdx && ls -la
+#           tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+#           echo "$HOME/sfdx/bin" >> $GITHUB_PATH
+#           echo The PATH is $GITHUB_PATH
+#           ~/sfdx/bin/sfdx version
+
+      # Download worflow artifacts from Git2SF workflow
+      # - name: Download workflow artifact
+      #   id: download_artifacts
+      #   if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     workflow: pipeline-run-scripts.yml
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: pr_num
+      #     if_no_artifact_found: fail
+
+      # Download worflow artifacts from Git2SF workflow
+      # - name: Download workflow artifact
+      #   id: download_artifacts_vlocityDiff
+      #   if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     workflow: pipeline-run-scripts.yml
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: vlocityDiff.txt
+      #     if_no_artifact_found: fail
+
+      # Display structure of downloaded files
+      # - name: Display structure of downloaded files
+      #   run: |
+      #     ls -la
+      # Read pr_num file
+      # - name: Read pr_num v2
+      #   id: get_pr_num
+      #   run: |
+      #     cd ./pr_num && ls -la
+      #     prnum=$(cat pr_num.txt)
+      #     echo "$prnum"
+      #     echo "outprnum=$prnum" >> $GITHUB_OUTPUT
+
+      # # Install Vlocity
+      # - name: Install Vlocity
+      #   run: |
+      #     npm install --global vlocity
+      #     vlocity --version
+
+      # # Install Git
+      # - name: Install Git
+      #   run: |
+      #     sudo apt update
+      #     sudo apt-get install -y git
+      #     git --version
+
+      # Store Auth URL
+      # - name: Store the SFDX Auth URL
+      #   run: |
+      #     echo ${{secrets.SFDX_AUTH_URL}} > ./authFile.txt
+      #     secretFileSize=$(wc -c "./authFile.txt" | awk '{print $1}')
+      #     if [ $secretFileSize == 1 ]; then
+      #       echo "Missing authFile secret. Is this workflow running on a fork?";
+      #       exit 1;
+      #     fi
+      # # Authenticate with Auth URL
+      # - name: Authenticate SFDX Instance
+      #   id: sfdxAuthenticate
+      #   run: |
+      #     echo "Logging as ${{ secrets.SFDXUSERNAME }}"
+      #     authResponse=$(sfdx auth:sfdxurl:store -f ./authFile.txt --json)
+      #     statusCode=$(jq -r '.status' <<< $authResponse)
+      #     echo $authResponse
+      #     echo $statusCode
+      #     if [[ "$statusCode" != "0" ]]; then
+      #       authenticationMessage=$(jq -r '.message' $authResponse)
+      #       echo "Error found: $authenticationMessage"
+      #       echo "$authenticationMessage"
+      #       exit 1
+      #     fi
+
+      # # Find comments in PR
+      # - name: Find Comment
+      #   uses: peter-evans/find-comment@v2
+      #   id: lastComment
+      #   with:
+      #     issue-number: ${{ steps.get_pr_num.outputs.outprnum }}
+      #     comment-author: "github-actions[bot]"
+      #     direction: last
+
+      # # Update a comment PR Thread
+      # - name: Update Comment Thread
+      #   uses: peter-evans/create-or-update-comment@v2
+      #   if: (steps.CatalogAndProductJob.outcome = 'success' || steps.ProductHierarchyMaintenanceJob.outcome = 'success' || steps.ClearManagedPlatformCacheJob.outcome = 'success' || steps.RefreshPlatformCacheFullJob.outcome = 'success' || steps.PopulateApiCacheJob.outcome = 'success')
+      #   with:
+      #     comment-id: ${{ steps.lastComment.outputs.comment-id }}
+      #     issue-number: ${{ steps.get_pr_num.outputs.outprnum }}
+      #     body: |
+      #       + Maintenance Jobs Completed :white_check_mark:

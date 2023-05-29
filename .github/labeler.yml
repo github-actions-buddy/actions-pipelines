@@ -1,0 +1,11 @@
+# Add 'label1' to any changes within 'example' folder or any subfolders
+feature:
+- .github/*
+
+# Add 'label2' to any file changes within 'example2' folder
+defect: 
+- vlocity/*
+
+# Add label3 to any change to .txt files within the entire repository. Quotation marks are required for the leading asterisk
+# label3:
+# - '**/*.txt'
