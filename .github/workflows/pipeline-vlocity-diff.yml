@@ -5,6 +5,13 @@ run-name: Workflow run no - ${{github.run_number}} for maintenance jobs by @${{ 
 
 # Workflow triggers
 on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+
   workflow_dispatch:
     inputs:
       sourceBranch:
@@ -36,6 +43,8 @@ jobs:
         uses: actions/labeler@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
       
       # Checkout repository
       - name: Checkout Repository
