@@ -38,7 +38,7 @@ jobs:
   run_maintenance_jobs:
     runs-on: ubuntu-latest
     steps:
-      # Label PR
+      # Label PR v4 test
       - name: Label PR
         uses: actions/labeler@v4
         with:
