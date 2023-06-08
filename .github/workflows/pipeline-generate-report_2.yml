@@ -93,7 +93,6 @@ jobs:
       - name: Rename Code-Coverage HTML report
         run: |
           ls -la
-          cd codeCoverage
           mv report-code-coverage.html report-code-coverage_CI_${{steps.date.outputs.buildDate}}.html
 
       # Upload artifact
