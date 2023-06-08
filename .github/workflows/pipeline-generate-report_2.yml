@@ -88,6 +88,13 @@ jobs:
           name: test_results_CI_${{steps.date.outputs.buildDate}}.json
           path: ./test_results_CI_${{steps.date.outputs.buildDate}}.json
           retention-days: 30
+      
+      # Rename artifact with date stamp
+      - name: Rename Code-Coverage HTML report
+        run: |
+          ls -la
+          cd codeCoverage
+          mv report-code-coverage.html report-code-coverage_CI_${{steps.date.outputs.buildDate}}.html
 
       # Upload artifact
       - name: Artifact upload - test_results_date.json
@@ -95,6 +102,6 @@ jobs:
         if: (steps.testExecution.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
-          name: report-code-coverage.html
-          path: ./report-code-coverage.html
+          name: report-code-coverage_CI_${{steps.date.outputs.buildDate}}.html
+          path: ./report-code-coverage_CI_${{steps.date.outputs.buildDate}}.html
           retention-days: 30
