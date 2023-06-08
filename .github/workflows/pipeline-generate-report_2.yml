@@ -15,7 +15,7 @@ on:
 jobs:
   test_execution_devci01:
     runs-on: ubuntu-latest
-#     environment: DEV-CI
+#   environment: DEV-CI
     steps:
       # Checkout the current repository
       - name: Checkout Repository
