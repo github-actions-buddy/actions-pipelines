@@ -103,8 +103,9 @@ jobs:
     needs: test_execution_devci01
     name: Test-Execution
     uses: ./.github/workflows/pipeline-vlocity-diff.yml
-    secrets:
-      token: ${{secrets.V_METADATA_SEC}}
+    with:
+      secrets:
+        token: ${{secrets.V_METADATA_SEC}}
     # steps:
     #   - uses: ./.github/workflows/pipeline-vlocity-diff.yml
     #     name: Test Execution
