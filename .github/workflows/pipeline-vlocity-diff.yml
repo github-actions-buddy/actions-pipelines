@@ -30,7 +30,7 @@ on:
   workflow_call:
 
 jobs:
-  run_maintenance_jobs:
+  test_execution:
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
