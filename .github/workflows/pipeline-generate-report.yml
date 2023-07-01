@@ -105,5 +105,5 @@ jobs:
     uses: ./.github/workflows/pipeline-vlocity-diff.yml
     with:
       python_test_versions: 3.7
-    secrets:
-      GIT_TOKEN: ${{secrets.V_SEC}}
+    secrets: inherit
+      # GIT_TOKEN: ${{secrets.V_SEC}}
