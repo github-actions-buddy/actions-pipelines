@@ -106,4 +106,4 @@ jobs:
     with:
       python_test_versions: 3.7
     secrets:
-      GIT_TOKEN: ${{secrets.V_METADATA_SEC}}
+      GIT_TOKEN: ${{secrets.V_SEC}}
