@@ -3,7 +3,7 @@ name: Scheduled workflow for DEV-CI-01 Apex Test Execution
 # Workflow run name
 run-name: Scheduled workflow run - ${{github.run_number}} for DEV-CI-01 Apex Test Execution
 
-# Workflow triggers
+# Workflow trigger
 on:
   pull_request:
     types: [opened, synchronize]
