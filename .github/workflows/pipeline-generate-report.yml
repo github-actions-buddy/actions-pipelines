@@ -100,7 +100,7 @@ jobs:
           retention-days: 30
   test_execution:
     runs-on: ubuntu-latest
-    needs: installation_authenticate_deploy
+    needs: test_execution_devci01
     steps:
       - uses: ./github/workflows/pipeline-vlocity-diff.yml@main
         name: Test Execution
