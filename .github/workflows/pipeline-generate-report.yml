@@ -103,7 +103,7 @@ jobs:
     needs: test_execution_devci01
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         # with:
         #   repository: Kiran-Waghamare/actions-pipelines
         #   token: ${{ github.token }}
