@@ -101,5 +101,5 @@ jobs:
   test_execution:
     runs-on: ubuntu-latest
     needs: test_execution_devci01
-    uses: ./github/workflows/pipeline-vlocity-diff.yml@main
+    uses: ./.github/workflows/pipeline-vlocity-diff.yml
     name: Test Execution
