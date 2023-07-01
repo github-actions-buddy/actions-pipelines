@@ -13,9 +13,9 @@ on:
       - "**/README.md"
 
 jobs:
-  runs-on: ubuntu-latest
   test_execution_devci01:
-#     environment: DEV-CI
+    runs-on: ubuntu-latest
+    # environment: DEV-CI
     steps:
       # Checkout the current repository
       - name: Checkout Repository
