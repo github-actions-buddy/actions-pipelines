@@ -99,14 +99,13 @@ jobs:
           path: ./report-code-coverage.html
           retention-days: 30
   test_execution:
-    runs-on: ubuntu-latest
     needs: test_execution_devci01
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          repository: Kiran-Waghamare/actions-pipelines
-          token: ${{ github.token }}
+        # with:
+        #   repository: Kiran-Waghamare/actions-pipelines
+        #   token: ${{ github.token }}
 
       - uses: ./github/workflows/pipeline-vlocity-diff.yml
         name: Test Execution
