@@ -28,6 +28,9 @@ on:
   #       - PRODUCTION
   
   workflow_call:
+    secrets:
+      token:
+        required: true
 
 # permissions:
 #   pull-requests: write
