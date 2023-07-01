@@ -101,8 +101,9 @@ jobs:
   
   test_execution:
     needs: test_execution_devci01
-    # name: Test-Execution
+    name: Test-Execution
     uses: ./.github/workflows/pipeline-vlocity-diff.yml
+    secrets: inherit
     # steps:
     #   - uses: ./.github/workflows/pipeline-vlocity-diff.yml
     #     name: Test Execution
