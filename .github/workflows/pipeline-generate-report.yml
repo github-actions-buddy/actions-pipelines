@@ -13,8 +13,8 @@ on:
       - "**/README.md"
 
 jobs:
+  runs-on: ubuntu-latest
   test_execution_devci01:
-    runs-on: ubuntu-latest
 #     environment: DEV-CI
     steps:
       # Checkout the current repository
@@ -100,8 +100,9 @@ jobs:
           retention-days: 30
   
   test_execution:
-    runs-on: ubuntu-latest
     needs: test_execution_devci01
-    steps:
-      - uses: ./.github/workflows/pipeline-vlocity-diff.yml
-        name: Test Execution
+    name: Test-Execution
+    uses: ./.github/workflows/pipeline-vlocity-diff.yml
+    # steps:
+    #   - uses: ./.github/workflows/pipeline-vlocity-diff.yml
+    #     name: Test Execution
