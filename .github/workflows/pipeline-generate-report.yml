@@ -104,8 +104,8 @@ jobs:
     name: Test-Execution
     uses: ./.github/workflows/pipeline-vlocity-diff.yml
     with:
-      secrets:
-        token: ${{secrets.V_METADATA_SEC}}
+    secrets:
+      token: ${{secrets.V_METADATA_SEC}}
     # steps:
     #   - uses: ./.github/workflows/pipeline-vlocity-diff.yml
     #     name: Test Execution
