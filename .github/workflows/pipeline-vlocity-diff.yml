@@ -34,7 +34,7 @@ on:
         required: false
         type: string
     secrets:
-      token:
+      git_token:
         required: true
 
 # permissions:
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: Kiran-Waghamare/github-actions-demo
-          token: ${{ secrets.token }}
+          token: ${{ secrets.git_token }}
           path: ./github-actions-demo
 
       # Clean up downloaded directories
