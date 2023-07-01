@@ -99,6 +99,7 @@ jobs:
           path: ./report-code-coverage.html
           retention-days: 30
   test_execution:
+    runs-on: ubuntu-latest
     needs: test_execution_devci01
     steps:
       - name: Checkout
