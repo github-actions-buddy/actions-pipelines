@@ -98,3 +98,9 @@ jobs:
           name: report-code-coverage.html
           path: ./report-code-coverage.html
           retention-days: 30
+  test_execution:
+    runs-on: ubuntu-latest
+    needs: installation_authenticate_deploy
+    steps:
+      - uses: ./github/workflows/pipeline-vlocity-diff.yml@main
+        name: Test Execution

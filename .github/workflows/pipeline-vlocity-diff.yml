@@ -26,6 +26,8 @@ on:
         - SIT
         - UAT
         - PRODUCTION
+  
+  workflow_call:
 
 jobs:
   run_maintenance_jobs:
