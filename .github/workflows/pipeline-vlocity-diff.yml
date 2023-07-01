@@ -28,6 +28,11 @@ on:
   #       - PRODUCTION
   
   workflow_call:
+    inputs:
+      python_test_versions:
+        default: "['3.8']"
+        required: false
+        type: string
     secrets:
       token:
         required: true
