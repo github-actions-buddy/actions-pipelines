@@ -68,7 +68,7 @@ jobs:
         # shell: python
         run: |
           statusCodeCheck = $(cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json)
-          statusCode = $(jq -r '.status' <<< $autstatusCodeCheck)
+          statusCode = $(jq -r '.status' <<< $statusCodeCheck)
 
           echo $statusCode
 
