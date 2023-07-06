@@ -72,7 +72,7 @@ jobs:
             system("cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json")
             exit(100)
             ls -la
-          except exit(100):
+          except exit:
             print("SF Test Execution Completed")
           except:
             print("Something went wrong")
