@@ -67,8 +67,9 @@ jobs:
         id: testExecution
         shell: python
         run: |
+          from os import system
           try:
-            cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json
+            system("cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json")
             exit(100)
             ls -la
           except ExitStatusCode:
