@@ -16,4 +16,4 @@ class ExitCode(Exception):
     EXIT_CODE = 100
 
     def __init__(self):
-    super().__init__( 'SF APEX RUN TEST COMMAND FINSIHED' )
+        super().__init__( 'SF APEX RUN TEST COMMAND FINSIHED' )
