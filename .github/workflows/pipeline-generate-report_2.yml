@@ -65,6 +65,7 @@ jobs:
       # Run tests on DEV-CI All tests in Org, except the ones that originate from installed managed packages
       - name: Run Apex Tests in the Org
         id: testExecution
+        shell: python
         run: |
           try:
             cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json
