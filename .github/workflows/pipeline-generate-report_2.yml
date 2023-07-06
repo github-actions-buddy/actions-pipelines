@@ -72,7 +72,7 @@ jobs:
 
           echo $statusCode
 
-          if [[ "$statusCode" == "100" ]]; then
+          if [[ "$statusCode" == '100' ]]; then
             echo "SF test execution success"
           else
             echo "::error:: Failure in sf apex run test command"
