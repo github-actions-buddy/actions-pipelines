@@ -65,7 +65,7 @@ jobs:
       # Run tests on DEV-CI All tests in Org, except the ones that originate from installed managed packages
       - name: Run Apex Tests in the Org
         id: testExecution
-        shell: python
+        # shell: python
         run: |
           from os import system
           try:
