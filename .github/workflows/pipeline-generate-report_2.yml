@@ -72,8 +72,10 @@ jobs:
             system("cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json")
             exit(100)
             ls -la
-          except ExitStatusCode:
+          except ExitStatusCode: 100
             print("SF Test Execution Completed")
+          except:
+            print("Something went wrong")
       
       # Checking out repo after changes
       # - uses: actions/checkout@v3
