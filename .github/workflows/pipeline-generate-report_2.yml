@@ -67,12 +67,13 @@ jobs:
         id: testExecution
         # shell: python
         run: |
-          statusCodeCheck=$(cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json)
+          cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json
+          statusCodeCheck=$(cat ./test_results_CI_${{steps.date.outputs.buildDate}}.json)
           statusCode=$(jq -r '.status' <<< $statusCodeCheck)
 
           echo $statusCode
 
-          if [[ "$statusCode" == '100' ]]; then
+          if [[ "$statusCode" == 100 ]]; then
             echo "SF test execution success"
           else
             echo "::error:: Failure in sf apex run test command"
