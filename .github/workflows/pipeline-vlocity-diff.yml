@@ -27,13 +27,13 @@ on:
         - UAT
         - PRODUCTION
   
-  workflow_call:
-    inputs:
-      python_test_versions:
-        default: "['3.8']"
-        required: false
-        type: string
-    secrets: inherit
+  # workflow_call:
+  #   inputs:
+  #     python_test_versions:
+  #       default: "['3.8']"
+  #       required: false
+  #       type: string
+  #   secrets: inherit
 
 # permissions:
 #   pull-requests: write
