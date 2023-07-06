@@ -46,12 +46,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Checkout other repo
-        uses: actions/checkout@v3
-        with:
-          repository: Kiran-Waghamare/github-actions-demo
-          token: ${{ secrets.V_METADATA_SEC }}
-          path: ./github-actions-demo
+      # - name: Checkout other repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: Kiran-Waghamare/github-actions-demo
+      #     token: ${{ secrets.V_METADATA_SEC }}
+      #     path: ./github-actions-demo
 
       # Clean up downloaded directories
       - name: Clean up step
