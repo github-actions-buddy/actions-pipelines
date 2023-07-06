@@ -65,16 +65,15 @@ jobs:
       # Run tests on DEV-CI All tests in Org, except the ones that originate from installed managed packages
       - name: Run Apex Tests in the Org
         id: testExecution
-        uses: actions/github-script@v3
-        with:
-          script: |
+        run: |
+          # try {
             cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json
+            exit 100
             ls -la
-            exit 1
-            core.setFailed('Custom error message')
-        # run: |
-        #   cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json
-        #   ls -la
+          # } catch (error) {
+          #   core.setFailed(error.message);
+          # }
+          
       
       # Checking out repo after changes
       # - uses: actions/checkout@v3
