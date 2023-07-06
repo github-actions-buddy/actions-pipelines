@@ -67,7 +67,7 @@ jobs:
         id: testExecution
         # shell: python
         run: |
-          statusCodeCheck = $(system("cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json"))
+          statusCodeCheck = $(cat ./codeCoverage/test.json > test_results_CI_${{steps.date.outputs.buildDate}}.json)
           statusCode = $(jq -r '.status' <<< $autstatusCodeCheck)
 
           echo $statusCode
