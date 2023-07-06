@@ -71,7 +71,7 @@ jobs:
           statusCodeCheck=$(cat ./test_results_CI_${{steps.date.outputs.buildDate}}.json)
           statusCode=$(jq -r '.status' <<< $statusCodeCheck)
 
-          echo $statusCodeCheck
+          # echo $statusCodeCheck
           echo $statusCode
 
           if [[ "$statusCode" = 100 ]]; then
