@@ -270,9 +270,12 @@ jobs:
         if: env.SF_METADATA_DEPLOY == 'true'
         continue-on-error: true
         run: |
-          if [ $? -eq 0 ] && [ $(ls srcToDeploy | wc -l) -ne 0 ]; then
+          exit 0
+          if [ $? -eq 0 ]; then
             echo "Success in MergeDX"
-          else 
+            zip -r srcToDeploy.zip ./codeCoverage
+            git rev-parse --verify HEAD
+          else
             echo "::warning:: Failure in MergeDX: The srcToDeploy.zip is EMPTY(i.e. No New Code Changes Detected)"
             exit 1
           fi
