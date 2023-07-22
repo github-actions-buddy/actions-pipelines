@@ -554,7 +554,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ env.PR_NUMBER }}
           token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Deployment Success :white_check_mark:
