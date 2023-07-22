@@ -492,17 +492,17 @@ jobs:
           body: |
             + Validate Success :white_check_mark:
 
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{env.PR_NUMBER}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "SFDX Validation success. "
-          token: ${{ secrets.V_METADATA_SEC }}
+      # # Set PullRequest Status
+      # - name: Set PR Status
+      #   if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+      #   uses: teamniteo/pull_request_status_action@v1.0.0
+      #   with:
+      #     pr_number: ${{env.PR_NUMBER}}
+      #     state: success
+      #     repository: ${{ github.repository }}
+      #     context: Build Nº ${{github.run_number}}
+      #     description: "SFDX Validation success. "
+      #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Update a comment in PR Thread: Validation-failed
       - name: Update comment - SFDX Validate Failed
@@ -516,16 +516,16 @@ jobs:
             + Validate Failed :x:
 
       # Set PullRequest Status
-      - name: Set PR Status
-        if: (steps.parseJsonUAT.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: error
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Validate fails, check artifact. "
-          token: ${{ secrets.V_METADATA_SEC }}
+      # - name: Set PR Status
+      #   if: (steps.parseJsonUAT.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+      #   uses: teamniteo/pull_request_status_action@v1.0.0
+      #   with:
+      #     pr_number: ${{github.event.pull_request.number}}
+      #     state: error
+      #     repository: ${{ github.repository }}
+      #     context: Build Nº ${{github.run_number}}
+      #     description: "Validate fails, check artifact. "
+      #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline because unit tests are failed
       - name: Cancel Pipeline Validate Fails
@@ -611,16 +611,16 @@ jobs:
             + Deployment Failed :x:
 
       # Set PullRequest Status
-      - name: Set PR Status
-        if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{env.PR_NUMBER}}
-          state: error
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Deploy fails, check artifacts. "
-          token: ${{ secrets.V_METADATA_SEC }}
+      # - name: Set PR Status
+      #   if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+      #   uses: teamniteo/pull_request_status_action@v1.0.0
+      #   with:
+      #     pr_number: ${{env.PR_NUMBER}}
+      #     state: error
+      #     repository: ${{ github.repository }}
+      #     context: Build Nº ${{github.run_number}}
+      #     description: "Deploy fails, check artifacts. "
+      #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline if force:source:deploy fails
       - name: Cancel Pipeline Deploy Fails
@@ -683,16 +683,16 @@ jobs:
             + Vlocity Deployment Success :white_check_mark:
 
       # Set PullRequest Status
-      - name: Set PR Status
-        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{env.PR_NUMBER}}
-          state: error
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Vlocity fails, check buildLog. "
-          token: ${{ secrets.V_METADATA_SEC }}
+      # - name: Set PR Status
+      #   if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+      #   uses: teamniteo/pull_request_status_action@v1.0.0
+      #   with:
+      #     pr_number: ${{env.PR_NUMBER}}
+      #     state: error
+      #     repository: ${{ github.repository }}
+      #     context: Build Nº ${{github.run_number}}
+      #     description: "Vlocity fails, check buildLog. "
+      #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline if vlocity deploy fails
       - name: Cancel Pipeline Vlocity Fails
@@ -702,16 +702,16 @@ jobs:
           exit 1
 
       # Set Pull Request Status
-      - name: Set PR Status
-        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{env.PR_NUMBER}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build Nº ${{github.run_number}}
-          description: "Build #${{github.run_number}} succesfully ends. "
-          token: ${{ secrets.V_METADATA_SEC }}
+      # - name: Set PR Status
+      #   if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+      #   uses: teamniteo/pull_request_status_action@v1.0.0
+      #   with:
+      #     pr_number: ${{env.PR_NUMBER}}
+      #     state: success
+      #     repository: ${{ github.repository }}
+      #     context: Build Nº ${{github.run_number}}
+      #     description: "Build #${{github.run_number}} succesfully ends. "
+      #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Approve PR to merge
       - name: Approve Pull Request
