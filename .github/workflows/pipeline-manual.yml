@@ -245,6 +245,7 @@ jobs:
           git fetch --all
           git checkout ${{ env.TARGET_BRANCH }}
           git checkout ${{ env.SOURCE_BRANCH }}
+          exit 1
       
       # Read pr_num file
       - name: Read vlocityDiff
@@ -650,7 +651,6 @@ jobs:
         continue-on-error: true
         run: |
           echo "PASS"
-          exit 1
 
       # Upload the output to ./VlocityBuildErrors.log
       - uses: actions/upload-artifact@v3
