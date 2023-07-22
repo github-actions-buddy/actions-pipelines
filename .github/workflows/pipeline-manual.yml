@@ -85,7 +85,7 @@ jobs:
         if: env.PR_NUMBER != ''
         with:
           issue-number: ${{env.PR_NUMBER}}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             ## **Starting build #[${{github.run_number}}][1]**
             ------
@@ -100,7 +100,7 @@ jobs:
           issue-number: ${{ env.PR_NUMBER }}
           comment-author: "github-actions[bot]"
           direction: last
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Checkout the current repository
       - name: Checkout Repository
@@ -208,7 +208,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Successful Salesforce authentication :white_check_mark:
 
@@ -219,7 +219,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Failure in Salesforce authentication :x:
 
@@ -284,7 +284,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Delta Package not built. :x:
 
@@ -310,7 +310,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Delta Package Built Successfully srcToDeploy.zip :white_check_mark:
               Navigate to workflow run URL: [1] :white_check_mark:
@@ -337,7 +337,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Nomenclature validation build succesfully :white_check_mark:
 
@@ -348,7 +348,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Nomenclature validation failed. :x:
 
@@ -388,7 +388,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Unit Tests to be run: ${{ env.UNIT_TESTS }}
 
@@ -485,7 +485,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Validate Success :white_check_mark:
 
@@ -509,7 +509,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Validate Failed :x:
 
@@ -554,7 +554,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Deployment Success :white_check_mark:
 
@@ -667,7 +667,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Vlocity Deployment Failed :x:
 
@@ -678,7 +678,7 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.MY_PAT }}
+          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Vlocity Deployment Success :white_check_mark:
 
