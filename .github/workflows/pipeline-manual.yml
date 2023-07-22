@@ -650,6 +650,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "PASS"
+          exit 1
 
       # Upload the output to ./VlocityBuildErrors.log
       - uses: actions/upload-artifact@v3
