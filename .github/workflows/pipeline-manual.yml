@@ -27,7 +27,7 @@ on:
       sfDeploymentFlag:
         description: 'Salesforce Metadata Deployment'
         required: true
-        default: false
+        # default: false
         type: boolean
       getUnitTests:
         description: "Test classes to execute"
@@ -36,7 +36,7 @@ on:
       vlocityDeploymentFlag:
         description: 'Vlocity Deployment'
         required: true
-        default: false
+        # default: false
         type: boolean
       targetEnv:
         description: 'Target Environment for Deployment'
