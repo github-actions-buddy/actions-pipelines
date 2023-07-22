@@ -502,8 +502,7 @@ jobs:
           repository: ${{ github.repository }}
           context: Build Nº ${{github.run_number}}
           description: "SFDX Validation success. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Update a comment in PR Thread: Validation-failed
       - name: Update comment - SFDX Validate Failed
@@ -526,8 +525,7 @@ jobs:
           repository: ${{ github.repository }}
           context: Build Nº ${{github.run_number}}
           description: "Validate fails, check artifact. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline because unit tests are failed
       - name: Cancel Pipeline Validate Fails
@@ -622,8 +620,7 @@ jobs:
           repository: ${{ github.repository }}
           context: Build Nº ${{github.run_number}}
           description: "Deploy fails, check artifacts. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline if force:source:deploy fails
       - name: Cancel Pipeline Deploy Fails
@@ -695,8 +692,7 @@ jobs:
           repository: ${{ github.repository }}
           context: Build Nº ${{github.run_number}}
           description: "Vlocity fails, check buildLog. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Stop the pipeline if vlocity deploy fails
       - name: Cancel Pipeline Vlocity Fails
@@ -715,13 +711,12 @@ jobs:
           repository: ${{ github.repository }}
           context: Build Nº ${{github.run_number}}
           description: "Build #${{github.run_number}} succesfully ends. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
 
       # Approve PR to merge
       - name: Approve Pull Request
         if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
         uses: juliangruber/approve-pull-request-action@v2.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.V_METADATA_SEC }}
           number: ${{env.PR_NUMBER}}
