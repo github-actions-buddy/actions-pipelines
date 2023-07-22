@@ -430,7 +430,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_CI.json
         id: sfdxValidateArtifact_CI
-        if: (steps.sfdxValidate.outcome != 'skipped')
+        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'DEV-CI')
         uses: actions/upload-artifact@v3
         with:
           name: validate_CI.json
@@ -439,7 +439,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_SIT.json
         id: sfdxValidateArtifact_SIT
-        if: (steps.sfdxValidate.outcome != 'skipped')
+        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'SIT')
         uses: actions/upload-artifact@v3
         with:
           name: validate_SIT.json
@@ -448,7 +448,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_UAT.json
         id: sfdxValidateArtifact_UAT
-        if: (steps.sfdxValidate.outcome != 'skipped')
+        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'UAT')
         uses: actions/upload-artifact@v3
         with:
           name: validate_UAT.json
@@ -457,7 +457,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_STG.json
         id: sfdxValidateArtifact_STG
-        if: (steps.sfdxValidate.outcome != 'skipped')
+        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'STG')
         uses: actions/upload-artifact@v3
         with:
           name: validate_STG.json
@@ -466,7 +466,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_PROD.json
         id: sfdxValidateArtifact_PROD
-        if: (steps.sfdxValidate.outcome != 'skipped')
+        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'PROD')
         uses: actions/upload-artifact@v3
         with:
           name: validate_PROD.json
@@ -562,7 +562,7 @@ jobs:
 
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_CI.json
-        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'DEV-CI')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_CI.json
@@ -570,7 +570,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_SIT.json
-        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'SIT')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_SIT.json
@@ -578,7 +578,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_UAT.json
-        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'UAT')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_UAT.json
@@ -586,7 +586,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_STG.json
-        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'STG')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_STG.json
@@ -594,7 +594,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_PROD.json
-        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'PROD')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_PROD.json
