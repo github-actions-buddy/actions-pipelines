@@ -714,9 +714,9 @@ jobs:
       #     token: ${{ secrets.V_METADATA_SEC }}
 
       # Approve PR to merge
-      - name: Approve Pull Request
-        if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-        uses: juliangruber/approve-pull-request-action@v2.0.0
-        with:
-          token: ${{ secrets.V_METADATA_SEC }}
-          number: ${{env.PR_NUMBER}}
+      # - name: Approve Pull Request
+      #   if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+      #   uses: juliangruber/approve-pull-request-action@v2.0.0
+      #   with:
+      #     token: ${{ secrets.V_METADATA_SEC }}
+      #     number: ${{env.PR_NUMBER}}
