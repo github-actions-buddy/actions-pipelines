@@ -111,7 +111,6 @@ jobs:
       #     sudo apt --only-upgrade install jq -y
       #     sudo apt --only-upgrade install grep -y
       #     sudo apt autoremove -y
-      # Checkout path: /home/runner/work/altice_metadata/altice_metadata/
 
       # Setup python v3.7
       # - uses: actions/setup-python@v4
