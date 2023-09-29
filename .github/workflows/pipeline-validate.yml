@@ -113,8 +113,11 @@ jobs:
           mkdir -p ~/cli/sf
           ls -la
           tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
-          echo "$HOME/sf/bin" >> $GITHUB_PATH
+          echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
           echo The PATH is $GITHUB_PATH
+
+      - name: Version check
+        run: |
           sf version
 
       # Install SF CLI V2
