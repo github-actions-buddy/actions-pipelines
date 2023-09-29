@@ -106,20 +106,20 @@ jobs:
       #     echo The PATH is $GITHUB_PATH
       #     ~/sfdx/bin/sfdx version
 
-      # Install SF CLI V2
-      - name: Install SF CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
-          mkdir -p ~/cli/sf
-          ls -la
-          tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
-          echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/cli/sf/bin/sf version
+      # # Install SF CLI V2
+      # - name: Install SF CLI
+      #   run: |
+      #     wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+      #     mkdir -p ~/cli/sf
+      #     ls -la
+      #     tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
+      #     echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
+      #     echo The PATH is $GITHUB_PATH
+      #     ~/cli/sf/bin/sf version
 
-      - name: Version check
-        run: |
-          sf version
+      # - name: Version check
+      #   run: |
+      #     sf version
 
       # Install SF CLI V2
       - name: NPM Install SF CLI
