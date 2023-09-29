@@ -112,7 +112,7 @@ jobs:
       #     sudo apt --only-upgrade install grep -y
       #     sudo apt autoremove -y
 
-      # Setup python v3.7
+      # Setup python v3.7 version
       # - uses: actions/setup-python@v4
       #   name: Install Python v3.7 and cache pip
       #   with:
