@@ -149,3 +149,16 @@ jobs:
           echo "$HOME/sf/bin" >> $GITHUB_PATH
           echo The PATH is $GITHUB_PATH
           ~/sf/bin/sf version
+
+      # Install SF CLI V2
+      - name: NPM Install SF CLI
+        run: |
+          node --version
+          npm install @salesforce/cli --global
+
+      # Verify
+      - name: Verify Installation
+        run: |
+          sf --version
+          sf commands
+          sf whatsnew
