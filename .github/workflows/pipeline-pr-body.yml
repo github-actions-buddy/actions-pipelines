@@ -27,7 +27,6 @@ jobs:
       - name: SFDX Load Dynamic Vars
         id: sfdxDynoVar
         continue-on-error: true
-        shell: bash
         run: |
           sudo -s
           source ORGS/.env.DEV-CI >> $GITHUB_ENV
@@ -40,7 +39,6 @@ jobs:
       #     mode: DEV-CI
 
       - name: print env variables
-        shell: bash
         run: |
           echo "Variable 1: ${{env.SF_User}}"
           cat ORGS/.env.DEV-CI
