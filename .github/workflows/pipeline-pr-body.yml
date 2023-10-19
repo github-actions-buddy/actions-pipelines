@@ -36,7 +36,7 @@ jobs:
 
       - name: Some other action
         run: |
-          echo "Variable 1: ${{ env. }}"
+          echo "Variable 1: ${{ env.SF_User }}"
       # # Find unit tests defined in the PR Body version 2
       # - name: Find Unit Tests In Pull Request Body v2
       #   id: regex-match
