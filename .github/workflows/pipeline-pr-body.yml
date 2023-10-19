@@ -29,7 +29,8 @@ jobs:
 
       - name: Load env
         run: |
-          dotenv -e "ORGS/.env.dev-ci"
+          cd ORGS
+          dotenv -e .env.dev-ci
 
       # Load specific Variables to this Enviroment
       - name: SFDX Load Dynamic Vars
