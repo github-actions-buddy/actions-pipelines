@@ -30,7 +30,8 @@ jobs:
         shell: bash
         run: |
           sudo -s
-          . ORGS/.env.DEV-CI
+          # source ORGS/.env.DEV-CI
+          echo "source ORGS/.env.DEV-CI" >> "$GITHUB_ENV"
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
