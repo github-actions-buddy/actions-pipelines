@@ -28,8 +28,7 @@ jobs:
         id: sfdxDynoVar
         continue-on-error: true
         run: |
-          sudo -s
-          source ORGS/.env.DEV-CI >> $GITHUB_ENV
+          sudo source ORGS/.env.DEV-CI >> $GITHUB_ENV
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
 
       # - name: Load .env file
