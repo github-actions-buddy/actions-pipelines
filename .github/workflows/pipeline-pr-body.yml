@@ -15,6 +15,7 @@ on:
 jobs:
   pr_body:
     runs-on: ubuntu-latest
+    environment: DEV-CI
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     steps:
@@ -22,20 +23,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        name: Setup Python
+      - name: Load .env file
+        uses: xom9ikk/dotenv@v2
         with:
-          python-version: '3.7'
+          path: ./ORGS/
+          mode: DEV-CI
 
-      - name: Setup Python
+      - name: print env variables
         run: |
-          pip install --upgrade argparse
-      # Find unit tests defined in the PR Body version 2
-      - name: Find Unit Tests In Pull Request Body v2
-        id: regex-match
+          echo ${{env.SF_User}}
+          cat ORGS/.env.DEV-CI
+
+      - name: Some other action
         run: |
-          echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
-          python3 ./readPRBody.py -s pullRequestBody.txt
-      # Print ENV PR_TESTS
-      - name: Echo PR_TESTS
-        run: echo ${{env.PR_TESTS}}
+          echo "Variable 1: ${{ env. }}"
+      # # Find unit tests defined in the PR Body version 2
+      # - name: Find Unit Tests In Pull Request Body v2
+      #   id: regex-match
+      #   run: |
+      #     echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
+      #     python3 ./readPRBody.py -s pullRequestBody.txt
+      # # Print ENV PR_TESTS
+      # - name: Echo PR_TESTS
+      #   run: echo ${{env.PR_TESTS}}
