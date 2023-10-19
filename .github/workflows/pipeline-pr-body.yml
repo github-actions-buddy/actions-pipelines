@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           sudo -s
-          source ORGS/.env.DEV-CI
+          . ORGS/.env.DEV-CI
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
