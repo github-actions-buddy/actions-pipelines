@@ -15,7 +15,7 @@ on:
 jobs:
   pr_body:
     runs-on: ubuntu-latest
-    environment: DEV-CI
+    environment: dev-ci
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     steps:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Load env
         run: |
-          dotenv -e ORGS/.env.DEV-CI
+          dotenv -e "ORGS/.env.dev-ci"
 
       # Load specific Variables to this Enviroment
       - name: SFDX Load Dynamic Vars
@@ -39,7 +39,7 @@ jobs:
           # source ORGS/.env.DEV-CI >> $GITHUB_ENV
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
           echo "Variable 1: ${{env.SF_User}}"
-          cat ORGS/.env.DEV-CI
+          cat ORGS/.env.dev-ci
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
@@ -50,7 +50,7 @@ jobs:
       - name: print env variables
         run: |
           echo "Variable 1: ${{env.SF_User}}"
-          cat ORGS/.env.DEV-CI
+          cat ORGS/.env.dev-ci
 
       # # Find unit tests defined in the PR Body version 2
       # - name: Find Unit Tests In Pull Request Body v2
