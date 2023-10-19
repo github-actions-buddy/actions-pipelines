@@ -23,12 +23,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Install dotenv
+        run: |
+          npm install -g dotenv-cli
+
+      - name: Load env
+        run: |
+          dotenv -e ORGS/.env.DEV-CI
+
       # Load specific Variables to this Enviroment
       - name: SFDX Load Dynamic Vars
         id: sfdxDynoVar
         continue-on-error: true
         run: |
-          source ORGS/.env.DEV-CI >> $GITHUB_ENV
+          # source ORGS/.env.DEV-CI >> $GITHUB_ENV
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
           echo "Variable 1: ${{env.SF_User}}"
           cat ORGS/.env.DEV-CI
