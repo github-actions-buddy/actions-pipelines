@@ -28,8 +28,10 @@ jobs:
         id: sfdxDynoVar
         continue-on-error: true
         run: |
-          sudo source ORGS/.env.DEV-CI >> $GITHUB_ENV
+          source ORGS/.env.DEV-CI >> $GITHUB_ENV
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
+          echo "Variable 1: ${{env.SF_User}}"
+          cat ORGS/.env.DEV-CI
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
