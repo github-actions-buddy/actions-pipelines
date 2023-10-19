@@ -39,7 +39,7 @@ jobs:
 
       - name: print env variables
         run: |
-          echo "Variable 1: ${{ env.SF_User }}"
+          echo "Variable 1: env.SF_User "
           cat ORGS/.env.DEV-CI
 
       # # Find unit tests defined in the PR Body version 2
