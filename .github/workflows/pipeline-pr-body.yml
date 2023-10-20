@@ -11,7 +11,7 @@ on:
       - develop
     paths-ignore:
       - "**/README.md"
-#Jobs Test
+#Jobs
 jobs:
   pr_body:
     runs-on: ubuntu-latest
