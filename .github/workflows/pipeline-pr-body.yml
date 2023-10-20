@@ -37,10 +37,10 @@ jobs:
         id: sfdxDynoVar
         continue-on-error: true
         run: |
-          source ORGS/.env.devci
+          source .env.devci
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
           echo "Variable 1: ${{env.SF_User}}"
-          cat ORGS/.env.devci
+          cat .env.devci
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
@@ -51,7 +51,7 @@ jobs:
       - name: print env variables
         run: |
           echo "Variable 1: ${{env.SF_User}}"
-          cat ORGS/.env.devci
+          cat .env.devci
 
       # # Find unit tests defined in the PR Body version 2
       # - name: Find Unit Tests In Pull Request Body v2
