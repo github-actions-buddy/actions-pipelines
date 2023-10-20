@@ -37,11 +37,7 @@ jobs:
         id: sfdxDynoVar
         continue-on-error: true
         run: |
-          {
-            echo "$GITHUB_ENV<<," 
-            cat .env.devci
-            echo ,
-          } >> "$GITHUB_ENV"
+          echo "cat .env.devci" >> "$GITHUB_ENV"
 
       - name: print env variables
         shell: bash
