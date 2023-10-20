@@ -35,7 +35,7 @@ jobs:
       - name: Load env vars using Python
         run: |
           python AddEnv.py
-          echo"Success"
+          echo "Success"
       # Load specific Variables to this Enviroment
       #- name: SFDX Load Dynamic Vars
       #  id: sfdxDynoVar
