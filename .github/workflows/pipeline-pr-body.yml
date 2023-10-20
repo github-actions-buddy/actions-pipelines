@@ -39,7 +39,7 @@ jobs:
         run: |
           {
             echo 'SF_ENV_FILE<<EOF'
-            .env.devci
+            cat .env.devci
             echo EOF
           } >> "$GITHUB_ENV"
           # sudo -s
@@ -60,6 +60,7 @@ jobs:
         shell: bash
         run: |
           echo "Variable 1: ${{env.SF_User}}"
+          echo "Variable 2: ${{env.SF_User2}}"
           cat .env.devci
 
       # # Find unit tests defined in the PR Body version 2
