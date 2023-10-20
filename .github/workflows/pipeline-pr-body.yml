@@ -39,9 +39,7 @@ jobs:
         shell: bash
         run: |
           source .env.devci
-          # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
-          echo "Variable 1: ${{env.SF_User}}"
-          cat .env.devci
+          # echo "source ORGS/.env.DEV-CI" >> "$GITHUB_ENV"
 
       # - name: Load .env file
       #   uses: xom9ikk/dotenv@v2
