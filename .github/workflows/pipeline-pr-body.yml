@@ -47,6 +47,7 @@ jobs:
       - name: print env variables
         shell: bash
         run: |
+          git fetch --all
           git diff --name-only ${{github.head_ref}} ${{github.base_ref}}
 
       - name: print env variables
