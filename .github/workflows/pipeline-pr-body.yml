@@ -15,7 +15,7 @@ on:
 jobs:
   pr_body:
     runs-on: ubuntu-latest
-    environment: dev-ci
+    environment: DEV-CI
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     steps:
@@ -36,7 +36,7 @@ jobs:
       - name: SFDX Load Dynamic Vars
         id: sfdxDynoVar
         continue-on-error: true
-        shell: sh
+        shell: bash
         run: |
           source .env.devci
           # echo "source ORGS/.env.DEV-CI" >> $GITHUB_ENV
@@ -50,7 +50,7 @@ jobs:
       #     mode: DEV-CI
 
       - name: print env variables
-        shell: sh
+        shell: bash
         run: |
           echo "Variable 1: ${{env.SF_User}}"
           cat .env.devci
