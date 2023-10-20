@@ -31,14 +31,18 @@ jobs:
       #   run: |
       #     cd ORGS
       #     dotenv -e .env.dev-ci
-
-      # Load specific Variables to this Enviroment
-      - name: SFDX Load Dynamic Vars
-        id: sfdxDynoVar
-        continue-on-error: true
-        shell: bash
+      
+      - name: Load env vars using Python
         run: |
-          source .env.devci
+          python AddEnv.py
+          echo"Success"
+      # Load specific Variables to this Enviroment
+      #- name: SFDX Load Dynamic Vars
+      #  id: sfdxDynoVar
+      #  continue-on-error: true
+      #  shell: bash
+      #  run: |
+      #    source .env.devci
 
       - name: print env variables
         shell: bash
