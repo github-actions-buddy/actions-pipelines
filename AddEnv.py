@@ -14,7 +14,7 @@ try:
                     exit(1)
                 else:
                     existing_keys.add(key)
-                    print(f'echo "{key}={value}" >> "$GITHUB_ENV"')
+                    print(f'echo "{key}={value.strip()}" >> "$GITHUB_ENV"')
 
 except FileNotFoundError:
     print(f"Error: File {env_file_path} not found.")
