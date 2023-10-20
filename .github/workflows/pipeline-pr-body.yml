@@ -47,6 +47,11 @@ jobs:
       - name: print env variables
         shell: bash
         run: |
+          git diff --name-only ${{github.base_ref}} ${{github.head_ref}}
+
+      - name: print env variables
+        shell: bash
+        run: |
           echo "Variable 1: ${{env.SF_User}}"
           echo "Variable 2: ${{env.SF_User2}}"
           cat .env.devci
