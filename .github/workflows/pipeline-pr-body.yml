@@ -41,9 +41,8 @@ jobs:
 
       - name: Get the last comment
         run: |
-          LAST_COMMENT_ID=$(gh pr list --repo ${{ github.repository }} --json number,title,state | jq '.[0].number')
+          LAST_COMMENT_ID=$(gh pr list --repo ${{ github.repository }} | jq '.[0].number')
           echo "LAST_COMMENT_ID=${LAST_COMMENT_ID}" >> $GITHUB_ENV
-
 
       - name: Set PR status to success
         run: gh pr status set success --repo ${{ github.repository }}
