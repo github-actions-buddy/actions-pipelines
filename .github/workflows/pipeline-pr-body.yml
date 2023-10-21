@@ -40,76 +40,76 @@ jobs:
       - name: Update Comment Thread - Dependencies installed
         run: |
           echo "+ All dependencies installed" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt 
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt 
 
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
         run: |
           echo "+ Successful Salesforce authentication :white_check_mark:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread
       - name: Update Comment Thread - Delta Package-Not Built
         # if: (steps.MergerDX.outcome != 'success' && github.event_name == 'pull_request')
         run: |
           echo "+ Delta Package not built. :x:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment PR Thread for Build-Success
       - name: Update Comment Thread - Delta Package Built Successfully
         # if: (github.event_name == 'pull_request' && steps.MergerDX.outcome == 'success')
         run: |
           echo -e "+ Delta Package Built Successfully srcToDeploy.zip :white_check_mark:\n Navigate to workflow run URL: [1] :white_check_mark:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Nomenclature-Success
       - name: Update Comment Thread - Nomenclature validation build succesfully
         # if: (steps.nomenclatureValidation.outcome == 'success' && github.event_name == 'pull_request')
         run: |
           echo "+ Nomenclature validation build succesfully :white_check_mark:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Nomenclature-Fails
       - name: Update Comment Thread - Nomenclature validation failed
         # if: (steps.MergerDX.outcome == 'success' && steps.nomenclatureValidation.outcome != 'success' && github.event_name == 'pull_request')
         run: |
           echo "+ Nomenclature validation failed. :x:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: If unit tests are defined otherwise skip this step
       - name: Update Comment Thread - Unit Tests to be run
         # if: (env.PR_TESTS != '' && github.event_name == 'pull_request')
         run: |
           echo " + Unit Tests to be run: ${{ env.PR_TESTS }}" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Validation-success
       - name: Update Comment Thread - SFDX Validate Success
         # if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode == 0 && github.event_name == 'pull_request')
         run: |
           echo "+ Validate Success :white_check_mark:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
  
       # Update a comment in PR Thread: Validation-failed
       - name: Update comment - SFDX Validate Failed
         # if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode != 0 && github.event_name == 'pull_request')
         run: |
           echo "+ Validate Failed :x:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Deployment-success
       - name: Update Comment Thread - SFDX Deploy comment Success
         # if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'pull_request'))
         run: |
           echo "+ Deployment Success :white_check_mark:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Deployment-failed
       - name: Update Comment Thread - SFDX Deploy Failure
         # if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'pull_request'))
         run: |
           echo "+ Deployment Failed :x:" >> comment.txt
-          gh pr comment ${{ env.PR_NUMBER }} --edit-last -F comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       - name: Load env vars using Python
         run: |
