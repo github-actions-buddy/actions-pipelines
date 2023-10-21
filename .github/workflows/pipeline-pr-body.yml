@@ -23,14 +23,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # - name: Install dotenv
-      #   run: |
-      #     npm install -g dotenv-cli
-
-      # - name: Load env
-      #   run: |
-      #     cd ORGS
-      #     dotenv -e .env.dev-ci
+      - name: GH CLI
+        run: |
+          echo "GH CLI Version: gh --version"
       
       - name: Load env vars using Python
         run: |
