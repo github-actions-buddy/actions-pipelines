@@ -47,7 +47,7 @@ jobs:
       # Update comment in PR Thread: OS dependencies installed
       - name: Update Comment Thread - Dependencies installed
         run: |
-          gh pr view --comments --json id | jq '.body' > simple.txt
+          gh pr view ${{ github.event.pull_request.number }} --comments --json body | jq -r '.body' > simple.txt
           cat simple.txt
 
       # Update comment in PR Thread: OS dependencies installed
