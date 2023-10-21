@@ -45,16 +45,16 @@ jobs:
           gh pr comment ${{ github.event.pull_request.number }} -F comment.txt
 
       # Update comment in PR Thread: OS dependencies installed
-      - name: Issue comment
-        run: |
-          LAST_ISSUE_COMMENT_BODY=$(gh pr view -c --json body)
-          echo "$LAST_ISSUE_COMMENT_BODY"
-          echo "${{ github.event.comment.body }}"
+      # - name: Issue comment
+      #   run: |
+      #     LAST_ISSUE_COMMENT_BODY=$(gh pr view -c --json body)
+      #     echo "$LAST_ISSUE_COMMENT_BODY"
+      #     echo "${{ github.event.comment.body }}"
 
-          # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
-          # cat simple2.txt
-          # gh pr view --comments --json body | jq -r '.[0].body' > simple.txt
-          # cat simple.txt
+      #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
+      #     # cat simple2.txt
+      #     # gh pr view --comments --json body | jq -r '.[0].body' > simple.txt
+      #     # cat simple.txt
 
       # Update comment in PR Thread: OS dependencies installed
       - name: Update Comment Thread - Dependencies installed
