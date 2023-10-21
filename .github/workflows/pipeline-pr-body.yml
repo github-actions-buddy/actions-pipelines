@@ -19,7 +19,7 @@ jobs:
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       # Checkout repository
       - name: Checkout Repository
