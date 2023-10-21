@@ -122,7 +122,7 @@ jobs:
           gh pr review ${{ github.event.pull_request.number }} --approve
 
       - name: Apporve PR - Fail
-        if: ${{steps.outcome.ApprovePR.outcome == 'failure'}}
+        if: ${{steps.ApprovePR.outcome == 'failure'}}
         run: |
           echo "+ Can not approve your own pull request :x:" >> comment.txt
           gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
