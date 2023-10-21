@@ -35,7 +35,8 @@ jobs:
           gh pr comment create --body "This is a new thread." --repo ${{ github.server_url }}/${{ github.repository }} --web
       
       - name: Update a comment
-        run: gh pr comment create 1 --body "This is an updated comment." --repo ${{ github.server_url }}/${{ github.repository }} --web
+        run: |
+          gh pr comment create 1 --body "This is an updated comment." --repo ${{ github.server_url }}/${{ github.repository }} --web
 
       - name: Find the last comment
         run: |
@@ -44,7 +45,7 @@ jobs:
 
       - name: Append a new comment after the last comment
         run: |
-        gh pr comment create 1 --edit-last --body "New Comment" --repo ${{ github.server_url }}/${{ github.repository }} --web
+          gh pr comment create 1 --edit-last --body "New Comment" --repo ${{ github.server_url }}/${{ github.repository }} --web
 
       - name: Load env vars using Python
         run: |
