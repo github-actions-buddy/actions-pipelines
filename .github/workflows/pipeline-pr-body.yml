@@ -32,11 +32,11 @@ jobs:
 
       - name: GH Create PR
         run: |
-          gh pr comment create ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }}
+          gh pr comment ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }}
       
       - name: Update a comment
         run: |
-          gh pr comment create ${{ github.event.pull_request.number }} --body "This is an updated comment." --repo ${{ github.repository }}
+          gh pr comment ${{ github.event.pull_request.number }} --body "This is an updated comment." --repo ${{ github.repository }}
 
       - name: Find the last comment
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Append a new comment after the last comment
         run: |
-          gh pr comment create ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --body "New Comment" --repo ${{ github.repository }}
+          gh pr comment ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --body "New Comment" --repo ${{ github.repository }}
 
       - name: Load env vars using Python
         run: |
