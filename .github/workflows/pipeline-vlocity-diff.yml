@@ -26,14 +26,45 @@ on:
         - SIT
         - UAT
         - PRODUCTION
+  
+  # workflow_call:
+  #   inputs:
+  #     python_test_versions:
+  #       default: "['3.8']"
+  #       required: false
+  #       type: string
+  #   secrets: inherit
+
+# permissions:
+#   pull-requests: write
 
 jobs:
-  run_maintenance_jobs:
+  test_execution:
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      # - name: Checkout other repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: Kiran-Waghamare/github-actions-demo
+      #     token: ${{ secrets.V_METADATA_SEC }}
+      #     path: ./github-actions-demo
+
+      # Clean up downloaded directories
+      - name: Clean up step
+        run: |
+          sudo rm -rf branch_name
+          sudo rm -rf deploy.json
+          sudo rm -rf nomenclatureErrorsReport
+          sudo rm -rf pr_num
+          sudo rm -rf sfdxScannerReport.html
+          sudo rm -rf srcToDeploy.zip
+          sudo rm -rf validate.json
+          sudo rm -rf describe.log
+          ls -la
 
       # Install required OS packages
       - name: Install OS dependencies
@@ -64,22 +95,36 @@ jobs:
           echo The PATH is $GITHUB_PATH
           ~/sfdx/bin/sfdx version
 
-      # Checkout current repository
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      # Clean up downloaded directories
-      - name: Clean up step
+      # Install Vlocity
+      - name: Install Vlocity
         run: |
-          sudo rm -rf branch_name
-          sudo rm -rf deploy.json
-          sudo rm -rf nomenclatureErrorsReport
-          sudo rm -rf pr_num
-          sudo rm -rf sfdxScannerReport.html
-          sudo rm -rf srcToDeploy.zip
-          sudo rm -rf validate.json
-          sudo rm -rf describe.log
-          ls -la
+          npm install --global vlocity
+          vlocity --version
+
+      # Install Git
+      - name: Install Git
+        run: |
+          sudo apt update
+          sudo apt-get install -y git
+          git --version
+      
+      # Get the difference in vlocity folder
+      - name: Getting Vlocity Diffs
+        id: VlocityDiff
+        continue-on-error: true
+        run: |
+          git fetch --all
+          git checkout ${{github.base_ref}}
+          git checkout ${{github.head_ref}}
+          python3 ./acct-scripts/utils/vlocityCheckDiffs.py ${{github.base_ref}} > vlocityDiff.txt
+      
+      # Read pr_num file
+      - name: Read vlocityDiff
+        id: get_vlocityDiff
+        run: |
+          vlocityDiff=$(cat ./vlocityDiff.txt)
+          echo "Vloicty Difference between source and target is:"
+          echo "$vlocityDiff"
 
       # Download worflow artifacts from Git2SF workflow
       # - name: Download workflow artifact
@@ -117,27 +162,6 @@ jobs:
       #     prnum=$(cat pr_num.txt)
       #     echo "$prnum"
       #     echo "outprnum=$prnum" >> $GITHUB_OUTPUT
-      # Read pr_num file
-      - name: Read vlocityDiff
-        id: get_vlocityDiff
-        run: |
-          cd ./vlocityDiff.txt && ls -la
-          vlocityDiff=$(cat vlocityDiff.txt)
-          echo "$vlocityDiff"
-          echo "outvlocityDiff=$vlocityDiff" >> $GITHUB_OUTPUT
-
-      # Install Vlocity
-      - name: Install Vlocity
-        run: |
-          npm install --global vlocity
-          vlocity --version
-
-      # Install Git
-      - name: Install Git
-        run: |
-          sudo apt update
-          sudo apt-get install -y git
-          git --version
 
       # Store Auth URL
       # - name: Store the SFDX Auth URL
@@ -164,43 +188,6 @@ jobs:
       #       exit 1
       #     fi
 
-      # Deploy the difference in vlocity folder to instance
-      - name: Run Maintenance Jobs
-        if: (steps.get_vlocityDiff.output.outvlocityDiff != '')
-        run: |
-          # Use the exit status of the grep command as the condition in the if statement
-          if grep -Eq "vlocity/(Product2|Catalog)/.*" ${{steps.get_vlocityDiff.output.outvlocityDiff}}; then
-            # If the exit status of the grep command is 0 (true), execute this branch
-            ./vlocity/apex/CatalogAndProductJob.cls
-            if [ $? -eq 0 ]; then
-              ./vlocity/apex/ProductHierarchyMaintenanceJob.cls
-              if [ $? -eq 0 ]; then
-                ./vlocity/apex/ClearManagedPlatformCacheJob.cls
-                if [ $? -eq 0 ]; then
-                  ./vlocity/apex/RefreshPlatformCacheFullJob.cls
-                  if [ $? -eq 0 ]; then
-                    ./vlocity/apex/PopulateApiCacheJob.cls
-                  else
-                    # If the exit status of the grep command is non-zero (false), execute this branch
-                    echo "::error::Maintenance jobs run was failed"
-                  fi
-                else
-                  # If the exit status of the grep command is non-zero (false), execute this branch
-                  echo "::error::Maintenance jobs run was failed"
-                fi
-              else
-                # If the exit status of the grep command is non-zero (false), execute this branch
-                echo "::error::Maintenance jobs run was failed"
-              fi
-            else
-              # If the exit status of the grep command is non-zero (false), execute this branch
-              echo "::error::Maintenance jobs run was failed"
-            fi
-          else
-            # If the exit status of the grep command is non-zero (false), execute this branch
-            echo "::error::Maintenance jobs run was failed"
-          fi
-
       # # Find comments in PR
       # - name: Find Comment
       #   uses: peter-evans/find-comment@v2
@@ -219,16 +206,3 @@ jobs:
       #     issue-number: ${{ steps.get_pr_num.outputs.outprnum }}
       #     body: |
       #       + Maintenance Jobs Completed :white_check_mark:
-
-      # Clean up downloaded directories
-      - name: Clean up step
-        run: |
-          sudo rm -rf branch_name
-          sudo rm -rf deploy.json
-          sudo rm -rf nomenclatureErrorsReport
-          sudo rm -rf pr_num
-          sudo rm -rf sfdxScannerReport.html
-          sudo rm -rf srcToDeploy.zip
-          sudo rm -rf validate.json
-          sudo rm -rf describe.log
-          ls -la

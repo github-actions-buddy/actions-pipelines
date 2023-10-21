@@ -3,7 +3,7 @@ name: Scheduled workflow for DEV-CI-01 Apex Test Execution
 # Workflow run name
 run-name: Scheduled workflow run - ${{github.run_number}} for DEV-CI-01 Apex Test Execution
 
-# Workflow triggers
+# Workflow trigger
 on:
   pull_request:
     types: [opened, synchronize]
@@ -15,7 +15,7 @@ on:
 jobs:
   test_execution_devci01:
     runs-on: ubuntu-latest
-#     environment: DEV-CI
+    # environment: DEV-CI
     steps:
       # Checkout the current repository
       - name: Checkout Repository
@@ -98,3 +98,12 @@ jobs:
           name: report-code-coverage.html
           path: ./report-code-coverage.html
           retention-days: 30
+  
+  test_execution:
+    needs: test_execution_devci01
+    name: Test-Execution
+    uses: ./.github/workflows/pipeline-vlocity-diff.yml
+    with:
+      python_test_versions: 3.7
+    secrets: inherit
+      # GIT_TOKEN: ${{secrets.V_SEC}}
