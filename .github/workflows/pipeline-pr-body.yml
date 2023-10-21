@@ -41,7 +41,7 @@ jobs:
 
       - name: Update a new comment after the last comment
         run: |
-          UPDATE_COMMENT="\nSecond Comment"
+          UPDATE_COMMENT="${{env.LAST_COMMENT_ID}}\nSecond Comment"
           gh pr comment ${{ github.event.pull_request.number }} --body "$UPDATE_COMMENT" --repo ${{ github.repository }}
 
       - name: Load env vars using Python
