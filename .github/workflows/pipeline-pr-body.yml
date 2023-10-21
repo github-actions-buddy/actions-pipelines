@@ -32,7 +32,7 @@ jobs:
 
       - name: GH Create PR
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }} --author "github-actions[bot]"
+          gh pr comment ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }}
 
       - name: Find the last comment
         run: |
@@ -44,7 +44,7 @@ jobs:
           LAST_COMMENT_ID=$(gh pr comment list --repo ${{ github.repository }} --json id | jq '.[-1]')
           LAST_COMMENT_BODY=$(gh pr comment view $LAST_COMMENT_ID --json body | jq -r '.body' | sed 's/"/\\"/g')
           NEW_COMMENT="$LAST_COMMENT_BODY This is a new comment."
-          gh pr comment ${{ github.event.pull_request.number }} --body "$NEW_COMMENT" --author "github-actions[bot]" --repo ${{ github.repository }}
+          gh pr comment ${{ github.event.pull_request.number }} --body "$NEW_COMMENT" --repo ${{ github.repository }}
 
       - name: Set PR status to success
         run: gh pr status set success --repo ${{ github.repository }}
