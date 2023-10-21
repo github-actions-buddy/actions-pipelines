@@ -18,6 +18,8 @@ jobs:
     environment: DEV-CI
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
+    env:
+      GH_TOKEN: ${{ secrets.MY_PAT }}
     steps:
       # Checkout repository
       - name: Checkout Repository
@@ -30,7 +32,7 @@ jobs:
 
       - name: GH Auth
         run: |
-          gh auth login --with-token < ${{ secrets.MY_PAT }}
+          gh auth login --with-token ${{ en.GH_TOKEN }}
       
       - name: Load env vars using Python
         run: |
