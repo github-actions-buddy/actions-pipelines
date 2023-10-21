@@ -25,7 +25,8 @@ jobs:
 
       - name: GH CLI
         run: |
-          echo "GH CLI Version:" gh --version
+          echo "GH CLI Version:"
+          gh --version
       
       - name: Load env vars using Python
         run: |
