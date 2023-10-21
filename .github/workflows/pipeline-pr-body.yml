@@ -32,6 +32,7 @@ jobs:
 
       - name: GH Create PR
         run: |
+          git fetch origin ${{github.head_ref}}
           gh pr comment --body "Hi from GitHub CLI"
       
       - name: Load env vars using Python
