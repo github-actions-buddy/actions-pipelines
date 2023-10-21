@@ -44,7 +44,7 @@ jobs:
           LAST_COMMENT_ID=${{ env.LAST_COMMENT_ID }}
           LAST_COMMENT_BODY=$(gh pr comment view $LAST_COMMENT_ID --json body | jq -r '.body')
           NEW_COMMENT="$LAST_COMMENT_BODY\nThis is the new comment"
-          gh pr comment create ${{ github.event.pull_request.number }} --body "$NEW_COMMENT" --repo ${{ github.repository }}
+          gh pr comment ${{ github.event.pull_request.number }} --body "$NEW_COMMENT" --repo ${{ github.repository }}
 
       # - name: Append new comment in new line
       #   run: |
