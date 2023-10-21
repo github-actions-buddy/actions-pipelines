@@ -32,10 +32,20 @@ jobs:
 
       - name: GH Create PR
         run: |
-          git fetch origin ${{github.head_ref}}
-          git checkout ${{github.head_ref}}
-          gh pr comment --body "Hi from GitHub CLI"
+          gh pr comment create --body "This is a new thread." --repo ${{ github.server_url }}/${{ github.repository }} --web
       
+      - name: Update a comment
+        run: gh pr comment create 1 --body "This is an updated comment." --repo ${{ github.server_url }}/${{ github.repository }} --web
+
+      - name: Find the last comment
+        run: |
+          LAST_COMMENT=$(gh pr comment list --repo ${{ github.server_url }}/${{ github.repository }} --json body | jq '.[-1].body')
+          echo "LAST_COMMENT=${LAST_COMMENT}" >> $GITHUB_ENV
+
+    - name: Append a new comment after the last comment
+      run: |
+        gh pr comment create 1 --edit-last --body "New Comment" --repo ${{ github.server_url }}/${{ github.repository }} --web
+
       - name: Load env vars using Python
         run: |
           python3 ./AddEnv.py
