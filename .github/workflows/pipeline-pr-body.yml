@@ -122,9 +122,9 @@ jobs:
           gh pr review ${{ github.event.pull_request.number }} --approve
 
       - name: Apporve PR - Fail
-        if: ${{steps.ApprovePR.outcome == 'failure'}}
+        if: (steps.ApporvePR.outcome == 'failure')
         run: |
-          echo "+ Can not approve your own pull request :x:" >> comment.txt
+          echo "+ Can not approve your own pull request." >> comment.txt
           gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       - name: Load env vars using Python
