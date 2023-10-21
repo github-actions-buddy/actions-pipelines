@@ -40,12 +40,12 @@ jobs:
 
       - name: Find the last comment
         run: |
-          LAST_COMMENT=$(gh pr comment list --repo ${{ github.server_url }}/${{ github.repository }} --json body | jq '.[-1].body')
-          echo "LAST_COMMENT=${LAST_COMMENT}" >> $GITHUB_ENV
+          LAST_COMMENT_ID=$(gh pr comment list --repo ${{ github.server_url }}/${{ github.repository }} --json id | jq '.[-1].id')
+          echo "LAST_COMMENT_ID=${LAST_COMMENT_ID}" >> $GITHUB_ENV
 
       - name: Append a new comment after the last comment
         run: |
-          gh pr comment create 1 --edit-last --body "New Comment" --repo ${{ github.server_url }}/${{ github.repository }} --web
+          gh pr comment create ${{env.LAST_COMMENT_ID}} --body "New Comment" --repo ${{ github.server_url }}/${{ github.repository }} --web
 
       - name: Load env vars using Python
         run: |
