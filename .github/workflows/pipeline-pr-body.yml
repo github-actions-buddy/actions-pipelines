@@ -47,7 +47,7 @@ jobs:
       # Update comment in PR Thread: OS dependencies installed
       - name: Issue comment
         run: |
-          LAST_ISSUE_COMMENT_BODY=$(gh pr view ${{ github.event.pull_request.number }} -c --jq '.comments.nodes[0].body')
+          LAST_ISSUE_COMMENT_BODY=$(gh pr view ${{ github.event.pull_request.number }} -c --json . | --jq '.comments.nodes[0].body')
           echo "$LAST_ISSUE_COMMENT_BODY"
 
           # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
