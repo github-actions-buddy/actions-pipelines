@@ -33,7 +33,10 @@ jobs:
       # Create a PR comment thread
       - name: Create PR comment Thread
         run: |
-          echo -e '## **Starting build #[${{github.run_number}}][1]**\n------\n[1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
+          echo -e '![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
+            ## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
           gh pr comment ${{ github.event.pull_request.number }} -F comment.txt
 
       # Update comment in PR Thread: OS dependencies installed
