@@ -35,9 +35,6 @@ on:
   #       type: string
   #   secrets: inherit
 
-# permissions:
-#   pull-requests: write
-
 jobs:
   test_execution:
     runs-on: ubuntu-latest
