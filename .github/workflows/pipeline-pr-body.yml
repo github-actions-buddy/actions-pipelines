@@ -33,7 +33,7 @@ jobs:
       # Create a PR comment thread
       - name: Create PR comment Thread
         run: |
-          echo -e '![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
+          echo -e '![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w180-h165-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
