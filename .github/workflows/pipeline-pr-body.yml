@@ -115,9 +115,17 @@ jobs:
           gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       # Update a comment in PR Thread: Deployment-failed
-      - name: Update Comment Thread - SFDX Deploy Failure
+      - name: Apporve PR
+        id: ApporvePR
+        continue-on-error: true
         run: |
           gh pr review ${{ github.event.pull_request.number }} --approve
+
+      - name: Apporve PR - Fail
+        if: ${{steps.outcome.ApprovePR.outcome == 'failure'}}
+        run: |
+          echo "+ Can not approve your own pull request :x:" >> comment.txt
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       - name: Load env vars using Python
         run: |
