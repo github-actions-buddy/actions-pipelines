@@ -30,3 +30,40 @@ jobs:
     - name: Append a new comment after the last comment
       run: |
         gh pr comment create 1 --body "${{ steps.find_last_comment.outputs.last_comment }} New Comment" --repo owner/repo --web
+
+
+name: GitHub Actions PR Thread
+
+on: 
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  create_thread_job:
+    runs-on: ubuntu-latest
+    outputs:
+      last_comment_id: ${{ steps.find_last_comment.outputs.last_comment_id }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up GitHub CLI
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Create a new thread
+      run: gh pr comment create --body "This is a new thread." --repo owner/repo --web
+
+    - name: Update a comment
+      run: gh pr comment create 1 --body "This is an updated comment." --repo owner/repo --web
+
+    - name: Find the last comment
+      id: find_last_comment
+      run: |
+        LAST_COMMENT_ID=$(gh pr comment list --repo owner/repo --json id | jq '.[-1].id')
+        echo "::set-output name=last_comment_id::$LAST_COMMENT_ID"
+
+    - name: Append a new comment after the last comment
+      run: |
+        gh pr comment create ${{ steps.find_last_comment.outputs.last_comment_id }} --body "New Comment" --repo owner/repo --web
