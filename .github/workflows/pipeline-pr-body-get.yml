@@ -36,7 +36,7 @@ jobs:
       - name: Issue last comment
         run: |
           echo "+ From Child workflow" >> comment.txt
-          gh issue comment --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
       #     # cat simple2.txt
