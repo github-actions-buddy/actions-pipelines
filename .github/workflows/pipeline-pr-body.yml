@@ -33,6 +33,7 @@ jobs:
       - name: Git fetch
         run:  |
           git fetch origin ${{github.head_ref}}
+          git checkout ${{github.head_ref}}
 
       # Create a PR comment thread
       - name: Create PR comment Thread
