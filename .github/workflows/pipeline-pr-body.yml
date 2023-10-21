@@ -34,11 +34,6 @@ jobs:
         run: |
           gh issue comment ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }}
 
-      - name: Find the last comment
-        run: |
-          LAST_COMMENT_ID=$(gh pr comment list --repo ${{ github.repository }} --json id | jq '.[-1]')
-          echo "LAST_COMMENT_ID=${LAST_COMMENT_ID}" >> $GITHUB_ENV
-
       - name: Get the last comment
         run: |
           LAST_COMMENT_ID=$(gh pr list --repo ${{ github.repository }} | jq '.[0].number')
