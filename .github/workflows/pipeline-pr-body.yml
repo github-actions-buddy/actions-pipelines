@@ -39,12 +39,23 @@ jobs:
           LAST_COMMENT_ID=$(gh pr comment list --repo ${{ github.repository }} --json id | jq '.[-1].id')
           echo "LAST_COMMENT_ID=${LAST_COMMENT_ID}" >> $GITHUB_ENV
 
-      - name: Update a new comment after the last comment
+      - name: Append new comment after the last comment
         run: |
-          # LAST_COMMENT_BODY=$(gh pr comment view ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --repo ${{ github.repository }} | jq -r .body)
-          # NEW_BODY="${LAST_COMMENT_BODY}\nSecond Comment"
-          # gh pr comment ${{ github.event.pull_request.number }} --body "${{env.LAST_COMMENT_ID}}\nSecond Comment" --repo ${{ github.repository }}
-          gh pr comment ${{ github.event.pull_request.number }} --edit-last ${{env.LAST_COMMENT_ID}} --body "+\n+ New Comment" --repo ${{ github.repository }}
+          LAST_COMMENT_ID=${{ env.LAST_COMMENT_ID }}
+          LAST_COMMENT_BODY=$(gh pr comment view $LAST_COMMENT_ID --json body | jq -r '.body')
+          NEW_COMMENT="$LAST_COMMENT_BODY\nThis is the new comment"
+          gh pr comment create ${{ github.event.pull_request.number }} --body "$NEW_COMMENT" --repo ${{ github.repository }}
+
+      # - name: Append new comment in new line
+      #   run: |
+      #     gh pr comment create ${{ github.event.pull_request.number }} --body "${{ env.COMMENTS }}This is the new comment" --repo ${{ github.repository }}
+
+      # - name: Update a new comment after the last comment
+      #   run: |
+      #     # LAST_COMMENT_BODY=$(gh pr comment view ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --repo ${{ github.repository }} | jq -r .body)
+      #     # NEW_BODY="${LAST_COMMENT_BODY}\nSecond Comment"
+      #     # gh pr comment ${{ github.event.pull_request.number }} --body "${{env.LAST_COMMENT_ID}}\nSecond Comment" --repo ${{ github.repository }}
+      #     gh pr comment ${{ github.event.pull_request.number }} --edit-last ${{env.LAST_COMMENT_ID}} --body "+\n+ New Comment" --repo ${{ github.repository }}
 
       - name: Load env vars using Python
         run: |
