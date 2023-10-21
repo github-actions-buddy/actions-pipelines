@@ -32,7 +32,7 @@ jobs:
 
       - name: GH Create PR
         run: |
-          gh pr comment create ${{ github.event.pull_request.number }} --body "This is a new thread." --repo ${{ github.repository }}
+          gh pr comment create --body "This is a new thread." --repo ${{ github.repository }}
       
       - name: Update a comment
         run: |
