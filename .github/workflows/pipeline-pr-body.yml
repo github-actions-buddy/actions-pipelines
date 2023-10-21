@@ -19,7 +19,7 @@ jobs:
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     env:
-      GH_TOKEN: ${{ secrets.MY_PAT }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       # Checkout repository
       - name: Checkout Repository
@@ -30,9 +30,9 @@ jobs:
           echo "GH CLI Version:"
           gh --version
 
-      - name: GH Auth
+      - name: GH Create PR
         run: |
-          gh auth login --with-token ${{ env.GH_TOKEN }}
+          gh pr comment --body "Hi from GitHub CLI"
       
       - name: Load env vars using Python
         run: |
