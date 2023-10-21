@@ -43,7 +43,7 @@ jobs:
         run: |
           LAST_COMMENT_BODY=$(gh pr comment view ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --repo ${{ github.repository }} | jq -r .body)
           NEW_BODY="${LAST_COMMENT_BODY}\nSecond Comment"
-          gh pr comment edit ${{ github.event.pull_request.number }} ${{env.LAST_COMMENT_ID}} --body "$NEW_BODY" --repo ${{ github.repository }}
+          gh pr comment edit ${{ github.event.pull_request.number }} --body "$NEW_BODY" --repo ${{ github.repository }}
 
       - name: Load env vars using Python
         run: |
