@@ -30,6 +30,10 @@ jobs:
           echo "GH CLI Version:"
           gh --version
 
+      - name: Git fetch
+        run:  |
+          git fetch ${{github.base_ref}}
+
       # Create a PR comment thread
       - name: Create PR comment Thread
         run: |
