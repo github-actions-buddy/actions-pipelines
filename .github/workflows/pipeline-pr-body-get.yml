@@ -26,6 +26,7 @@ jobs:
           echo "GH CLI Version:"
           gh --version
 
+      # git fetch
       - name: Git fetch
         run:  |
           git fetch origin ${{github.head_ref}}
