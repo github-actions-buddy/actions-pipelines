@@ -19,7 +19,7 @@ jobs:
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
     env:
-      GH_TOKEN: ${{ secrets.V_METADATA_SEC }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # Checkout repository
       - name: Checkout Repository
@@ -43,7 +43,7 @@ jobs:
       - name: Update Comment Thread - Dependencies installed
         run: |
           echo "+ All dependencies installed" >> comment.txt
-          gh pr comment ${{ github.event.pull_request.number }} --author "github-actions[bot]" --edit-last -F comment.txt 
+          gh pr comment ${{ github.event.pull_request.number }} --author github-actions[bot] --edit-last -F comment.txt 
 
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
