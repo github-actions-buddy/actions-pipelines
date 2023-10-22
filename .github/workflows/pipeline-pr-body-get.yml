@@ -35,7 +35,7 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          gh issue comment 13 --edit-last > comment.txt
+          echo '${{github.event.comment.body}}'
 
       #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
       #     # cat simple2.txt
