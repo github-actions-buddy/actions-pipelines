@@ -47,10 +47,10 @@ jobs:
       - name: Update Comment Thread - Dependencies installed
         run: |
           echo "+ All dependencies installed" >> comment.txt
-          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt 
+          gh issue comment 13 --edit-last -F comment.txt 
 
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
         run: |
           echo "+ Successful Salesforce authentication :white_check_mark:" >> comment.txt
-          gh pr comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
