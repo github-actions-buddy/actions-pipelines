@@ -26,7 +26,6 @@ jobs:
           echo "GH CLI Version:"
           gh --version
 
-      # git fetch
       - name: Git fetch
         run:  |
           git fetch origin ${{github.head_ref}}
@@ -39,19 +38,47 @@ jobs:
           echo "Last issue thread is fetched"
           cat comment.txt
 
-      #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
-      #     # cat simple2.txt
-      #     # gh pr view --comments --json body | jq -r '.[0].body' > simple.txt
-      #     # cat simple.txt
-
-      # Update comment in PR Thread: OS dependencies installed
-      - name: Update Comment Thread - Dependencies installed
+      # Update a comment PR Thread for Build-Success
+      - name: Update Comment Thread - Delta Package Built Successfully
         run: |
-          echo "+ FROM CHILD" >> comment.txt
-          gh issue comment 13 --edit-last -F comment.txt 
+          echo -e '------
+            ### Artifact Links
 
-      # Update comment in PR Thread: Salesforce-Auth-Success
-      - name: Update Comment Thread - Salesforce authentication Successful
+            + Generated Delta Package [srcToDeploy.zip] :white_check_mark:' >> comment.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for describe.log
+      - name: Update Comment Thread - describe.log
         run: |
-          echo "+ Successful Salesforce authentication Child :white_check_mark:" >> comment.txt
-          gh issue comment 13 --edit-last -F comment.txt
+          echo "+ Generated [describe.log] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for NomenclatureReport.html
+      - name: Update Comment Thread - NomenclatureReport
+        run: |
+          echo "+ Generated [NomenclatureReport.html] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for Validate.json
+      - name: Update Comment Thread - Validate.json
+        run: |
+          echo "+ Generated [Validate.json] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for Deploy.json
+      - name: Update Comment Thread - Deploy.json
+        run: |
+          echo "+ Generated [Deploy.json] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for sfdxScannerReport.html
+      - name: Update Comment Thread - sfdxScannerReport.html
+        run: |
+          echo "+ Generated [sfdxScannerReport.html] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+      
+      # Update a comment PR Thread for VlocityBuildErrors.log
+      - name: Update Comment Thread - VlocityBuildErrors.log
+        run: |
+          echo "+ Generated [VlocityBuildError.log] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
