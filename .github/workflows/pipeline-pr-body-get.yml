@@ -48,10 +48,10 @@ jobs:
       - name: Update Comment Thread - Dependencies installed
         run: |
           echo "+ FROM CHILD" >> comment.txt
-          gh pr comment 13 --edit-last -F comment.txt 
+          gh issue comment 13 --edit-last -F comment.txt 
 
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
         run: |
           echo "+ Successful Salesforce authentication Child :white_check_mark:" >> comment.txt
-          gh pr comment 13 --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
