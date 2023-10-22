@@ -34,7 +34,7 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          Body=$(gh issue view ${{ github.event.pull_request.number }} --json comments | jq -r '.comments[-1].body')
+          Body=$(gh issue view 13 --json comments | jq -r '.comments[-1].body')
           echo "Body is: $Body"
 
       #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
