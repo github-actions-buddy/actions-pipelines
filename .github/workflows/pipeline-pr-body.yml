@@ -136,7 +136,7 @@ jobs:
         id: ApporvePR
         continue-on-error: true
         run: |
-          gh issue review ${{ github.event.pull_request.number }} --approve
+          gh issue review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes"
 
       - name: Apporve PR - Fail
         if: (steps.ApporvePR.outcome == 'failure')
