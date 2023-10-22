@@ -34,8 +34,8 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          echo "+ From Child workflow" >> comment.txt
-          gh issue comment --edit-last -F comment.txt
+          Body=$(gh issue view ${{ github.event.pull_request.number }} --json comments | jq -r '.comments[-1].body')
+          echo "Body is: $Body"
 
       #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
       #     # cat simple2.txt
