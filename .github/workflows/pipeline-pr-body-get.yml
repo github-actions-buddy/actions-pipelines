@@ -45,40 +45,40 @@ jobs:
             ### Artifact Links
 
             + Generated Delta Package [srcToDeploy.zip] :white_check_mark:' >> comment.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       # Update a comment PR Thread for describe.log
       - name: Update Comment Thread - describe.log
         run: |
           echo "+ Generated [describe.log] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       # Update a comment PR Thread for NomenclatureReport.html
       - name: Update Comment Thread - NomenclatureReport
         run: |
           echo "+ Generated [NomenclatureReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       # Update a comment PR Thread for Validate.json
       - name: Update Comment Thread - Validate.json
         run: |
           echo "+ Generated [Validate.json] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       # Update a comment PR Thread for Deploy.json
       - name: Update Comment Thread - Deploy.json
         run: |
           echo "+ Generated [Deploy.json] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
 
       # Update a comment PR Thread for sfdxScannerReport.html
       - name: Update Comment Thread - sfdxScannerReport.html
         run: |
           echo "+ Generated [sfdxScannerReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
       
       # Update a comment PR Thread for VlocityBuildErrors.log
       - name: Update Comment Thread - VlocityBuildErrors.log
         run: |
           echo "+ Generated [VlocityBuildError.log] :white_check_mark:" >> comments.txt
-          gh issue comment ${{ steps.get_pr_num.outputs.outprnum }} --edit-last -F comment.txt
+          gh issue comment 13 --edit-last -F comment.txt
