@@ -35,7 +35,7 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          echo '$(gh issue view 13 --json comments | jq -r '.comments[-1].body)' > comment.txt
+          echo "$(gh issue view 13 --json comments | jq -r '.comments[-1].body')" > comment.txt
           echo "Last issue thread is fetched"
           cat comment.txt
 
