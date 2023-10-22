@@ -35,8 +35,9 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          Body=$(gh issue view 13 --json comments | jq -r '.comments[-1].body')
-          echo "Body is: $Body"
+          echo '$(gh issue view 13 --json comments | jq -r '.comments[-1].body)' > comment.txt
+          echo "Last issue thread is fetched"
+          cat comment.txt
 
       #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
       #     # cat simple2.txt
