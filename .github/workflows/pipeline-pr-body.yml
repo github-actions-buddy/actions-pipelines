@@ -136,12 +136,16 @@ jobs:
         id: ApporvePR
         continue-on-error: true
         run: |
-          gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes"
+          gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
+          ----
+          @{{ github.event.issue.user.login }} Deployment is complete, please review."
 
       - name: Apporve PR - Fail
         if: (steps.ApporvePR.outcome == 'failure')
         run: |
-          echo "+ Can not approve your own pull request." >> comment.txt
+          echo -e "+ Can not approve your own pull request 
+          ----
+          @{{ github.event.issue.user.login }} Deployment is complete, please review." >> comment.txt
           gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
       - name: Load env vars using Python
