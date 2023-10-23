@@ -138,11 +138,11 @@ jobs:
         run: |
           echo "Login: @${{ github.event.pull_request.user.login }}"
           if [['@${{ github.event.pull_request.user.login}}' != 'Kiran-Waghamare']]; then
-            gh pr review ${{ github.event.pull_request.number }} --apporve --comment --body "GitHub-Actions[Bot] Approved the changes
+            gh pr review ${{ github.event.pull_request.number }} --apporve --body "GitHub-Actions[Bot] Approved the changes
             ----
             @${{ github.event.pull_request.user.login }} Deployment is complete, please review."
           else
-            gh pr review ${{ github.event.pull_request.number }} --approve --comment --body "GitHub-Actions[Bot] Approved the changes
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
             ----
             @${{ github.event.pull_request.user.login }} Deployment is complete, please review."
           fi
