@@ -57,11 +57,22 @@ jobs:
         run: |
           python3 pullRequest.py
       
-      - name: Upload artifact
+      - name: Upload artifact - githubPR.json
         uses: actions/upload-artifact@v3
         with:
-          name: PullRequestDashboard.html
-          path: ./PullRequestDashboard.html
+          name: githubPR.json
+          path: ./githubPR.json
+          retention-days: 1
+      
+      - name: Python script
+        run: |
+          python3 GenerateReport.py
+      
+      - name: Upload artifact - githubPR.html
+        uses: actions/upload-artifact@v3
+        with:
+          name: githubPR.html
+          path: ./githubPR.html
           retention-days: 1
 
       # Update a comment in PR Thread: Deployment-failed
