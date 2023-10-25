@@ -129,3 +129,136 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+v2
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(pr):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(pr['created_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+    if pr['closed_at']:
+        closed_date = datetime.strptime(pr['closed_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (closed_date - created_date).days
+    elif pr['merged_at']:
+        merged_date = datetime.strptime(pr['merged_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (merged_date - created_date).days
+    else:
+        today = date.today()
+        return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th>PR Number</th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th>Created Date</th>
+                        <th>Merged Date</th>
+                        <th>PR State</th>
+                        <th>Number of days PR Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        days_open = calculate_days_open(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td style="text-align: left;">{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td style="text-align: left;">{pr['created_at']}</td>
+                        <td style="text-align: left;">{pr['merged_at'] if pr['merged_at'] else ''}</td>
+                        <td>{pr_state}</td>
+                        <td>{days_open}</td>
+                    </tr>
+"""
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()
