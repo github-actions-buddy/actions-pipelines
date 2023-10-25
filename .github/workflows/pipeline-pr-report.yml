@@ -51,7 +51,7 @@ jobs:
 
       - name: Python script
         run: |
-          python3 ./pullRequest.py
+          python3 pullRequest.py
       
       - name: Upload artifact
         uses: actions/upload-artifact@v3
