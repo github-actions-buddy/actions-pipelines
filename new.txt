@@ -553,3 +553,139 @@ def main():
 # Runs the main function if the script is run directly
 if __name__ == "__main__":
     main()
+
+v6
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+            float: right;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th>PR Number <div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Title <div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Author <div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Created Date <div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Merged Date <div class="arrow" onclick="sortTable(4)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR State <div class="arrow" onclick="sortTable(5)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    pr_numbers = set()
+
+    for pr in pull_requests:
+        if pr['number'] not in pr_numbers:
+            pr_state = determine_pr_state(pr)
+            html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+            """
+            pr_numbers.add(pr['number'])
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            // Sorting logic here
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
