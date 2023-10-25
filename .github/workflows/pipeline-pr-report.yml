@@ -49,6 +49,10 @@ jobs:
           echo "+ All dependencies installed" >> comment.txt
           gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
 
+      - name: Install pygithub
+        run: |
+          pip install PyGithub
+
       - name: Python script
         run: |
           python3 pullRequest.py
