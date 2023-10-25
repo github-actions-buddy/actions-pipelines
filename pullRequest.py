@@ -3,7 +3,7 @@ from datetime import datetime
 
 # GitHub access token or username and password
 ACCESS_TOKEN = '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'
-REPO_NAME = 'actions-pipelines'
+REPO_NAME = 'Kiran-Waghamare/actions-pipelines'
 
 g = Github(ACCESS_TOKEN)
 
