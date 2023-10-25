@@ -279,3 +279,146 @@ def main():
 # Runs the main function if the script is run directly
 if __name__ == "__main__":
     main()
+
+v4
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th><div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div> PR Number</th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th><div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div> Created Date</th>
+                        <th><div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div> Merged Date</th>
+                        <th><div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div> PR State</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.querySelector("table");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
