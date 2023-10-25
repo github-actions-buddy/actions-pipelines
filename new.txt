@@ -1330,3 +1330,104 @@ def main():
 # Runs the main function if the script is run directly
 if __name__ == "__main__":
     main()
+
+another fix
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 10%;">Days Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    # Rest of the code
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        // ... (rest of the script)
+
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()
