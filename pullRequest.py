@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Constants
 URL_BASE = "https://api.github.com/repos/Kiran-Waghamare/actions-pipelines/pulls"
-HEADERS = {'Authorization': 'Bearer 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'}
+HEADERS = {'Authorization': 'Bearer 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'}
 FILENAME = 'githubPR.json'
 
 def fetch_pull_requests(page):
