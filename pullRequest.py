@@ -2,8 +2,8 @@ from github import Github
 from datetime import datetime
 
 # GitHub access token or username and password
-ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'
-REPO_NAME = 'repository_name'
+ACCESS_TOKEN = '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'
+REPO_NAME = 'actions-pipelines'
 
 g = Github(ACCESS_TOKEN)
 

@@ -1,0 +1,77 @@
+name: Pipeline PR Generate Report
+
+# Workflow run name
+run-name: Workflow run PR No - ${{ github.event.pull_request.number }} and PR title - ${{ github.event.pull_request.title }} by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - develop
+    paths-ignore:
+      - "**/README.md"
+#Jobs
+jobs:
+  pr_body:
+    runs-on: ubuntu-latest
+    environment: DEV-CI
+    # Only executes next steps if Source branch name starts with feature or defect
+    if: ((github.event_name == 'pull_request'))
+    env:
+      GH_TOKEN: ${{ secrets.V_METADATA_SEC }}
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: GH CLI
+        run: |
+          echo "GH CLI Version:"
+          gh --version
+
+      - name: Git fetch
+        run:  |
+          git fetch origin ${{github.head_ref}}
+          git checkout ${{github.head_ref}}
+
+      # Create a PR comment thread
+      - name: Create PR comment Thread
+        run: |
+          echo -e '## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} -F comment.txt
+
+      # Update comment in PR Thread: OS dependencies installed
+      - name: Update Comment Thread - Dependencies installed
+        run: |
+          echo "+ All dependencies installed" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      - name: Python script
+        run: |
+          python3 ./pullRequest.py
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PullRequestDashboard.html
+          path: ./PullRequestDashboard.html
+          retention-days: 1
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Apporve PR
+        id: ApporvePR
+        continue-on-error: true
+        run: |
+          echo "Login: @${{ github.event.pull_request.user.login }}"
+          if [['@${{ github.event.pull_request.user.login}}' != 'Kiran-Waghamare']]; then
+            gh pr review ${{ github.event.pull_request.number }} --approve --body "GitHub-Actions[Bot] Approved the changes
+            ----
+            @${{ github.event.pull_request.user.login }} Changes Approved"
+          else
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
+            ----
+            @${{ github.event.pull_request.user.login }} Cant approve your own pull request"
+          fi
