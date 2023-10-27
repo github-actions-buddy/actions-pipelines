@@ -136,14 +136,14 @@ jobs:
         continue-on-error: true
         run: |
           echo "Login: @${{ github.event.pull_request.user.login }}"
-          if [['@${{ github.event.pull_request.user.login}}' != 'Kiran-Waghamare']]; then
-            gh pr review ${{ github.event.pull_request.number }} --approve --body "GitHub-Actions[Bot] Approved the changes
-            ----
-            @${{ github.event.pull_request.user.login }} Changes Approved"
-          else
+          if [["${{ github.event.pull_request.user.login}}" == "Kiran-Waghamare"]]; then
             gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
             ----
             @${{ github.event.pull_request.user.login }} Cant approve your own pull request"
+          else
+            gh pr review ${{ github.event.pull_request.number }} --approve --body "GitHub-Actions[Bot] Approved the changes
+            ----
+            @${{ github.event.pull_request.user.login }} Changes Approved"
           fi
 
       # - name: Apporve PR - Fail
