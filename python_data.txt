@@ -270,3 +270,73 @@ if __name__ == '__main__':
         print("Invalid JSON file format. Please provide a valid JSON file.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+v5
+import json
+import argparse
+
+def generate_html_report(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
+
+    status = "Failed" if data["status"] == 1 else "Success"
+
+    components = [component["fileName"] for component in data["result"]["details"]["componentSuccesses"]]
+
+    lines_not_covered = ', '.join(map(str, [loc["line"] for coverage in data["result"]["details"]["runTestResult"]["codeCoverage"] for loc in coverage["locationsNotCovered"]]))
+    total_lines = sum(coverage["numLocations"] for coverage in data["result"]["details"]["runTestResult"]["codeCoverage"])
+    lines_not_covered_count = sum(coverage["numLocationsNotCovered"] for coverage in data["result"]["details"]["runTestResult"]["codeCoverage"])
+    coverage_warnings_messages = "\n".join(coverage["message"] for coverage in data["result"]["details"]["runTestResult"]["codeCoverageWarnings"])
+    coverage_warnings_names = "\n".join(coverage["name"] for coverage in data["result"]["details"]["runTestResult"]["codeCoverageWarnings"])
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SF Validation Report</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container mt-4">
+            <h2>Heading of report - SF Validation</h2>
+            <h4>Status - {status}</h4>
+            <h4>Component Success</h4>
+            <ul>
+    """
+
+    for component in components:
+        html_content += f"<li>{component}</li>\n"
+
+    html_content += f"""
+            </ul>
+            <h4>Apex Test Results</h4>
+            <p>Numbers of lines not covered - {lines_not_covered}</p>
+            <p>Total number of lines - {total_lines}</p>
+            <p>Number of lines not covered - {lines_not_covered_count}</p>
+            <h4>Code Coverage Warnings</h4>
+            <p>{coverage_warnings_messages}</p>
+            <p>{coverage_warnings_names}</p>
+        </div>
+    </body>
+    </html>
+    """
+
+    with open('SF_Validation_Report.html', 'w') as file:
+        file.write(html_content)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate an HTML report based on a JSON file.')
+    parser.add_argument('-f', '--file', help='JSON file name', required=True)
+    args = parser.parse_args()
+
+    try:
+        generate_html_report(args.file)
+        print("HTML report has been generated successfully.")
+    except FileNotFoundError:
+        print("File not found. Please provide a valid file name.")
+    except IOError:
+        print("An error occurred while handling the file.")
+    except json.JSONDecodeError:
+        print("Invalid JSON file format. Please provide a valid JSON file.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
