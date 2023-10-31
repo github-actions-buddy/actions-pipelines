@@ -1282,3 +1282,28 @@ if __name__ == '__main__':
         print("Invalid JSON file format. Please provide a valid JSON file.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+json data for Failure
+{
+  "status": 1,
+  "result": {
+    "checkOnly": true,
+    "completedDate": "2023-10-31T11:10:07.000Z",
+    "createdBy": "0052600000A2XFS",
+    "createdByName": "cicd integration",
+    "createdDate": "2023-10-31T11:09:50.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "PermissionSet",
+          "created": false,
+          "createdDate": "2023-10-31T11:10:05.000Z",
+          "deleted": false,
+          "fileName": "permissionsets/ALT_PS_PT_Integration_Temporary.permissionset",
+          "fullName": "ALT_PS_PT_Integration_Temporary",
+          "problem": "In field: apexClass - no ApexClass named ALT_CLS_ALT_CLS_GetDocumentURL found",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
