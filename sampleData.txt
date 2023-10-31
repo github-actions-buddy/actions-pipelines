@@ -1,0 +1,177 @@
+"runTestResult": {
+        "codeCoverage": [
+          {
+            "id": "01p26000007wmw0AAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 50,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 52,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 53,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 78,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 88,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler",
+            "namespace": null,
+            "numLocations": 55,
+            "numLocationsNotCovered": 5,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmvpAAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 51,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_DOMAIN_CommercialAttributes",
+            "namespace": null,
+            "numLocations": 50,
+            "numLocationsNotCovered": 1,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000008A2WJAA0",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 19,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 48,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 52,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 76,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "CustomGetOffersRHandler",
+            "namespace": null,
+            "numLocations": 43,
+            "numLocationsNotCovered": 4,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007vAWCAA2",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 53,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 57,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "PricingPlanHelper",
+            "namespace": null,
+            "numLocations": 1826,
+            "numLocationsNotCovered": 1611,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmvvAAA",
+            "name": "ALT_DOMAIN_Products",
+            "namespace": null,
+            "numLocations": 56,
+            "numLocationsNotCovered": 0,
+            "type": "Class",
+            "dmlInfo": [],
+            "locationsNotCovered": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmw1AAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 46,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 48,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_IMPLEMENTATION_PricingMatrixService",
+            "namespace": null,
+            "numLocations": 33,
+            "numLocationsNotCovered": 2,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          }
+        ],
+        "codeCoverageWarnings": [
+          {
+            "id": "01p26000007vAWC",
+            "message": "Test coverage of selected Apex Class is 11,774%, at least 75% test coverage is required",
+            "name": "PricingPlanHelper",
+            "namespace": null
+          }
