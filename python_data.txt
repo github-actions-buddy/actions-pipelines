@@ -67,16 +67,21 @@ if __name__ == "__main__":
 
 v2
 import json
-from datetime import datetime
 
-# Read the input JSON file
-def read_json_file(filename):
-    with open(filename, 'r') as file:
-        data = json.load(file)
-    return data
+def generate_html_report(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
 
-# Generate HTML report
-def generate_html_report(data):
+    status = "Failed" if data["status"] == 1 else "Success"
+
+    components = [component["fileName"] for component in data["details"]["componentSuccesses"]]
+
+    lines_not_covered = ', '.join(map(str, data["runTestResult"]["codeCoverage"]["locationsNotCovered"]))
+    total_lines = data["runTestResult"]["codeCoverage"]["numLocations"]
+    lines_not_covered_count = data["runTestResult"]["codeCoverage"]["numLocationsNotCovered"]
+    coverage_warnings_message = data["runTestResult"]["codeCoverageWarnings"]["message"]
+    coverage_warnings_name = data["runTestResult"]["codeCoverageWarnings"]["name"]
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -87,45 +92,41 @@ def generate_html_report(data):
     <body>
         <div class="container mt-4">
             <h2>Heading of report - SF Validation</h2>
-            <h4>Status - {'Failed' if data['status'] == 1 else 'Success'}</h4>
+            <h4>Status - {status}</h4>
             <h4>Component Success</h4>
             <ul>
     """
-    for component in data['details']['componentSuccesses']:
-        html_content += f"<li>{component['fileName']}</li>\n"
 
-    html_content += """
+    for component in components:
+        html_content += f"<li>{component}</li>\n"
+
+    html_content += f"""
             </ul>
             <h4>Apex Test Results</h4>
-            <p>Numbers of lines not covered - {', '.join(map(str, data['runTestResult']['codeCoverage']['locationsNotCovered']))}</p>
-            <p>Total number of lines - {data['runTestResult']['codeCoverage']['numLocations']}</p>
-            <p>Number of lines not covered - {data['runTestResult']['codeCoverage']['numLocationsNotCovered']}</p>
+            <p>Numbers of lines not covered - {lines_not_covered}</p>
+            <p>Total number of lines - {total_lines}</p>
+            <p>Number of lines not covered - {lines_not_covered_count}</p>
             <h4>Code Coverage Warnings</h4>
-            <p>{data['runTestResult']['codeCoverageWarnings']['message']}</p>
-            <p>{data['runTestResult']['codeCoverageWarnings']['name']}</p>
+            <p>{coverage_warnings_message}</p>
+            <p>{coverage_warnings_name}</p>
         </div>
     </body>
     </html>
     """
-    return html_content
 
-# Write the generated HTML report to a file
-def write_html_report(html_content):
     with open('SF_Validation_Report.html', 'w') as file:
         file.write(html_content)
 
-# Handle file-related errors and exceptions
-try:
-    file_name = input("Enter the JSON file name: ")
-    json_data = read_json_file(file_name)
-    html_report = generate_html_report(json_data)
-    write_html_report(html_report)
-    print("HTML report has been generated successfully.")
-except FileNotFoundError:
-    print("File not found. Please provide a valid file name.")
-except IOError:
-    print("An error occurred while handling the file.")
-except json.JSONDecodeError:
-    print("Invalid JSON file format. Please provide a valid JSON file.")
-except Exception as e:
-    print(f"An unexpected error occurred: {e}")
+if __name__ == '__main__':
+    try:
+        file_name = input("Enter the JSON file name: ")
+        generate_html_report(file_name)
+        print("HTML report has been generated successfully.")
+    except FileNotFoundError:
+        print("File not found. Please provide a valid file name.")
+    except IOError:
+        print("An error occurred while handling the file.")
+    except json.JSONDecodeError:
+        print("Invalid JSON file format. Please provide a valid JSON file.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
