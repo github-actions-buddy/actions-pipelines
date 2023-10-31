@@ -1,0 +1,66 @@
+import json
+import sys
+import html
+
+def generate_html_from_json(input_file):
+    try:
+        with open(input_file, 'r') as f:
+            data_json = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found.")
+        return
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON format in '{input_file}'.")
+        return
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return
+
+    html_content = f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SF Validation Report</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Heading of report - SF Validation</h1>
+            <h2>Status - {'Failed' if data_json['status'] == 1 else 'Success'}</h2>
+            <h3>Component Success</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+    '''
+
+    for item in data_json['componentSuccesses']:
+        html_content += f"                    <tr><td>{html.escape(item['fileName'])}</td></tr>\n"
+
+    html_content += f'''
+                </tbody>
+            </table>
+            <h3>Apex Test Results</h3>
+            <p>Lines not covered: {', '.join(map(str, data_json['runTestResult']['codeCoverage']['locationsNotCovered']))}</p>
+            <p>Total number of lines: {data_json['runTestResult']['codeCoverage']['numLocations']}</p>
+            <p>Number of lines not covered: {data_json['runTestResult']['codeCoverage']['numLocationsNotCovered']}</p>
+            <h3>Code Coverage Warnings</h3>
+            <p>{html.escape(data_json['runTestResult']['codeCoverageWarnings'][0]['message'])} - {html.escape(data_json['runTestResult']['codeCoverageWarnings'][0]['name'])}</p>
+        </div>
+    </body>
+    </html>
+    '''
+
+    with open('sf_validation_report.html', 'w') as file:
+        file.write(html_content)
+
+    print("HTML report generated successfully.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script_name.py input_file.json")
+    else:
+        generate_html_from_json(sys.argv[1])
