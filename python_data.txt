@@ -1862,3 +1862,171 @@ if __name__ == '__main__':
         print("Invalid JSON file format. Please provide a valid JSON file.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+
+v16
+
+import json
+import argparse
+
+def generate_html_report(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
+
+    status = "Failure" if data["status"] == 1 else "Success"
+
+    component_failures = data["result"]["details"].get("componentFailures", None)
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SF Validation Report</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            th, td {{
+                border: 1px solid black;
+                padding: 5px;
+            }}
+            .center {{
+                text-align: center;
+            }}
+            .header {{
+                background-color: #0078D4;
+                color: white;
+                border: 1px solid black;
+                padding: 10px;
+            }}
+            .success {{
+                background-color: #ADFFB4;
+                padding: 10px;
+                margin-bottom: 20px;
+            }}
+            .failure {{
+                background-color: #FFB4B4;
+                padding: 10px;
+                margin-bottom: 20px;
+            }}
+            .warning {{
+                background-color: #FFFFA5;
+                padding: 10px;
+                margin-bottom: 20px;
+            }}
+        </style>
+    </head>
+    <body style="background-color: white;">
+        <div class="container mt-4">
+            <h2 class="center header">Salesforce Validation Report</h2>
+            <div class="row">
+                <div class="col">
+                    <h4 class="center" style="background-color: {'#ADFFB4' if components else '#FFD700'};">Component Success</h4>
+                    <ol>
+    """
+
+    components = data["result"]["details"]["componentSuccesses"]
+    if components:
+        for component in components:
+            html_content += f"<li>{component['fileName']}</li>\n"
+    else:
+        html_content += "<p>No component Success</p>"
+
+    html_content += """
+                    </ol>
+                </div>
+            </div>
+    """
+
+    if component_failures:
+        html_content += """
+        <div class="row">
+            <div class="col">
+                <h4 class="center" style="background-color: #FFB4B4;">Component Failures</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid black;">Component Name</th>
+                            <th style="border: 1px solid black;">Problem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        """
+
+        for failure in component_failures:
+            html_content += f"<tr><td>{failure['fileName']}</td><td>{failure['problem']}</td></tr>\n"
+
+        html_content += """
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        """
+    else:
+        html_content += "<div class='row'><div class='col'><h4 class='center' style='background-color: #ADFFB4;'>Component Failures</h4><p>No component Failures</p></div></div>"
+
+    html_content += """
+            <div class="row">
+                <div class="col">
+                    <h4 class="center warning">Apex Test Results</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid black;">Class</th>
+                                <th style="border: 1px solid black;">Locations Not Covered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    """
+
+    for coverage in data["result"]["details"]["runTestResult"]["codeCoverage"]:
+        html_content += f"<tr><td>{coverage['name']}</td><td>{', '.join(map(str, [loc['line'] for loc in coverage.get('locationsNotCovered', [])]))}</td></tr>\n"
+
+    html_content += f"""
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h4 class="center warning">Code Coverage Warnings</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="border: 1px solid black;">Name</th>
+                                <th style="border: 1px solid black;">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    """
+
+    coverage_warnings = data["result"]["details"]["runTestResult"]["codeCoverageWarnings"]
+    for warning in coverage_warnings:
+        html_content += f"<tr><td>{warning['name']}</td><td>{warning['message']}</td></tr>\n"
+
+    html_content += f"""
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    with open('SF_Validation_Report.html', 'w') as file:
+        file.write(html_content)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate an HTML report based on a JSON file.')
+    parser.add_argument('-f', '--file', help='JSON file name', required=True)
+    args = parser.parse_args()
+
+    try:
+        generate_html_report(args.file)
+        print("HTML report has been generated successfully.")
+    except FileNotFoundError:
+        print("File not found. Please provide a valid file name.")
+    except IOError:
+        print("An error occurred while handling the file.")
+    except json.JSONDecodeError:
+        print("Invalid JSON file format. Please provide a valid JSON file.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
