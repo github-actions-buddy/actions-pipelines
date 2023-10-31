@@ -1307,3 +1307,124 @@ json data for Failure
           "success": false
         }
       ],
+
+v13
+import json
+import argparse
+
+def generate_html_report(json_file):
+    with open(json_file) as f:
+        data = json.load(f)
+
+    component_failures = data["result"]["details"].get("componentFailures", None)
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SF Validation Report</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            table, th, td {{
+                border: 1px solid black;
+            }}
+        </style>
+    </head>
+    <body style="background-color: white;">
+        <div class="container mt-4">
+            <h2 style="background-color: #0078D4; color: white; text-align: center;">Heading of report - SF Validation</h2>
+            <h4>Status - {"Failure" if data["status"] == 1 else "Success"}</h4>
+            <h4>Component Failures</h4>
+    """
+
+    if component_failures:
+        html_content += """
+        <table style="width:100%">
+            <tr>
+                <th>Component Name</th>
+                <th>Problem</th>
+            </tr>
+        """
+
+        for failure in component_failures:
+            html_content += f"""
+            <tr>
+                <td>{failure["fileName"]}</td>
+                <td>{failure["problem"]}</td>
+            </tr>
+            """
+        html_content += "</table>"
+    else:
+        html_content += "<p>No component Failures</p>"
+
+    html_content += """
+            <h4>Component Success</h4>
+            <ol>
+    """
+
+    components = data["result"]["details"]["componentSuccesses"]
+    for component in components:
+        html_content += f"<li>{component['fileName']}</li>\n"
+
+    html_content += """
+            </ol>
+            <h4>Apex Test Results</h4>
+            <table style="width:100%">
+                <tr>
+                    <th>Class</th>
+                    <th>Results</th>
+                </tr>
+    """
+
+    for coverage in data["result"]["details"]["runTestResult"]["codeCoverage"]:
+        html_content += f"""
+        <tr>
+            <td>{coverage['name']}</td>
+            <td>{', '.join(str(loc['line']) for loc in coverage['locationsNotCovered'])}</td>
+        </tr>
+        """
+
+    html_content += """
+            </table>
+            <h4>Code Coverage Warnings</h4>
+            <table style="width:100%">
+                <tr>
+                    <th>Name</th>
+                    <th>Message</th>
+                </tr>
+    """
+
+    for warning in data["result"]["details"]["runTestResult"]["codeCoverageWarnings"]:
+        html_content += f"""
+        <tr>
+            <td>{warning['name']}</td>
+            <td>{warning['message']}</td>
+        </tr>
+        """
+
+    html_content += """
+            </table>
+        </div>
+    </body>
+    </html>
+    """
+
+    with open('SF_Validation_Report.html', 'w') as file:
+        file.write(html_content)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate an HTML report based on a JSON file.')
+    parser.add_argument('-f', '--file', help='JSON file name', required=True)
+    args = parser.parse_args()
+
+    try:
+        generate_html_report(args.file)
+        print("HTML report has been generated successfully.")
+    except FileNotFoundError:
+        print("File not found. Please provide a valid file name.")
+    except IOError:
+        print("An error occurred while handling the file.")
+    except json.JSONDecodeError:
+        print("Invalid JSON file format. Please provide a valid JSON file.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
