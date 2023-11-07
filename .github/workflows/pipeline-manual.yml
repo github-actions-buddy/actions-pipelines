@@ -78,7 +78,7 @@ jobs:
       SF_METADATA_DEPLOY: ${{inputs.sfDeploymentFlag}}
       VLOCITY_DEPLOY: ${{inputs.vlocityDeploymentFlag}}
       UNIT_TESTS: ${{inputs.getUnitTests}}
-      GET_USERNAME: ${{github.event.workflow_dispatch.sender}}
+      GET_USERNAME: ${{github.event.workflow_dispatch.sender.login}}
     steps:
       # Create a PR comment thread
       - name: Create PR comment Thread
@@ -204,7 +204,7 @@ jobs:
 
       - name: Print Username
         run: |
-          echo "${env.GET_USERNAME}"
+          echo "${{env.GET_USERNAME}}"
       
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
