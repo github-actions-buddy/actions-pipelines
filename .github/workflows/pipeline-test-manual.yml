@@ -48,6 +48,17 @@ on:
     paths-ignore:
       - "**/README.md"
 
+#   pull_request:
+#     types: [opened, synchronize]
+#     branches:
+#       - develop
+#       - int
+#       - release
+#       - "integration/**"
+#       - "release/**"
+#     paths-ignore:
+#       - "**/README.md"
+
 # Environment Variables
 env:
   GIT_USER_NAME: github
@@ -60,6 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     # Only executes next steps if Source branch name starts with develop
     if: (startswith(${{inputs.sourceBranch}},'feature') || ((github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') && contains(github.ref, 'feature/')))
+
     env:
       TARGET_ENVIRONMNET: ${{inputs.targetEnv}}
       CHECK_FLG: ${{inputs.checkFLG}}

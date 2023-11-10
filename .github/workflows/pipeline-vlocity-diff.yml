@@ -1,0 +1,205 @@
+name: Pipeline to run maintenance jobs
+
+# Workflow run name
+run-name: Workflow run no - ${{github.run_number}} for maintenance jobs by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  workflow_dispatch:
+    inputs:
+      sourceBranch:
+        description: "Source Branch"
+        required: true
+        type: string
+      targetBranch:
+        description: "Target Branch"
+        required: true
+        type: string
+      targetEnv:
+        description: 'Target Environment for Deployment'
+        default: 'None'
+        type: choice
+        required: true
+        options:
+        - None
+        - CI
+        - SIT
+        - UAT
+        - PRODUCTION
+  
+  # workflow_call:
+  #   inputs:
+  #     python_test_versions:
+  #       default: "['3.8']"
+  #       required: false
+  #       type: string
+  #   secrets: inherit
+
+jobs:
+  test_execution:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # - name: Checkout other repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: Kiran-Waghamare/github-actions-demo
+      #     token: ${{ secrets.V_METADATA_SEC }}
+      #     path: ./github-actions-demo
+
+      # Clean up downloaded directories
+      - name: Clean up step
+        run: |
+          sudo rm -rf branch_name
+          sudo rm -rf deploy.json
+          sudo rm -rf nomenclatureErrorsReport
+          sudo rm -rf pr_num
+          sudo rm -rf sfdxScannerReport.html
+          sudo rm -rf srcToDeploy.zip
+          sudo rm -rf validate.json
+          sudo rm -rf describe.log
+          ls -la
+
+      # Install required OS packages
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get clean -y
+          sudo apt-get update -y
+          sudo apt --only-upgrade install -y zip
+          sudo apt --only-upgrade install -y curl
+          sudo apt --only-upgrade install -y wget
+          sudo apt install openjdk-8-jdk -y
+          sudo apt --only-upgrade install jq -y
+          sudo apt --only-upgrade install grep -y
+          sudo apt autoremove -y
+
+      # Setup Node v14
+      - uses: actions/setup-node@v3
+        name: Install Node v18
+        with:
+          node-version: "18"
+
+      # Install the SFDX-CLI
+      - name: Install SFDX-CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          mkdir ~/sfdx && ls -la
+          tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+          echo "$HOME/sfdx/bin" >> $GITHUB_PATH
+          echo The PATH is $GITHUB_PATH
+          ~/sfdx/bin/sfdx version
+
+      # Install Vlocity
+      - name: Install Vlocity
+        run: |
+          npm install --global vlocity
+          vlocity --version
+
+      # Install Git
+      - name: Install Git
+        run: |
+          sudo apt update
+          sudo apt-get install -y git
+          git --version
+      
+      # Get the difference in vlocity folder
+      - name: Getting Vlocity Diffs
+        id: VlocityDiff
+        continue-on-error: true
+        run: |
+          git fetch --all
+          git checkout ${{github.base_ref}}
+          git checkout ${{github.head_ref}}
+          python3 ./acct-scripts/utils/vlocityCheckDiffs.py ${{github.base_ref}} > vlocityDiff.txt
+      
+      # Read pr_num file
+      - name: Read vlocityDiff
+        id: get_vlocityDiff
+        run: |
+          vlocityDiff=$(cat ./vlocityDiff.txt)
+          echo "Vloicty Difference between source and target is:"
+          echo "$vlocityDiff"
+
+      # Download worflow artifacts from Git2SF workflow
+      # - name: Download workflow artifact
+      #   id: download_artifacts
+      #   if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     workflow: pipeline-run-scripts.yml
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: pr_num
+      #     if_no_artifact_found: fail
+
+      # Download worflow artifacts from Git2SF workflow
+      # - name: Download workflow artifact
+      #   id: download_artifacts_vlocityDiff
+      #   if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     workflow: pipeline-run-scripts.yml
+      #     run_id: ${{ github.event.workflow_run.id }}
+      #     name: vlocityDiff.txt
+      #     if_no_artifact_found: fail
+
+      # Display structure of downloaded files
+      # - name: Display structure of downloaded files
+      #   run: |
+      #     ls -la
+      # Read pr_num file
+      # - name: Read pr_num v2
+      #   id: get_pr_num
+      #   run: |
+      #     cd ./pr_num && ls -la
+      #     prnum=$(cat pr_num.txt)
+      #     echo "$prnum"
+      #     echo "outprnum=$prnum" >> $GITHUB_OUTPUT
+
+      # Store Auth URL
+      # - name: Store the SFDX Auth URL
+      #   run: |
+      #     echo ${{secrets.SFDX_AUTH_URL}} > ./authFile.txt
+      #     secretFileSize=$(wc -c "./authFile.txt" | awk '{print $1}')
+      #     if [ $secretFileSize == 1 ]; then
+      #       echo "Missing authFile secret. Is this workflow running on a fork?";
+      #       exit 1;
+      #     fi
+      # # Authenticate with Auth URL
+      # - name: Authenticate SFDX Instance
+      #   id: sfdxAuthenticate
+      #   run: |
+      #     echo "Logging as ${{ secrets.SFDXUSERNAME }}"
+      #     authResponse=$(sfdx auth:sfdxurl:store -f ./authFile.txt --json)
+      #     statusCode=$(jq -r '.status' <<< $authResponse)
+      #     echo $authResponse
+      #     echo $statusCode
+      #     if [[ "$statusCode" != "0" ]]; then
+      #       authenticationMessage=$(jq -r '.message' $authResponse)
+      #       echo "Error found: $authenticationMessage"
+      #       echo "$authenticationMessage"
+      #       exit 1
+      #     fi
+
+      # # Find comments in PR
+      # - name: Find Comment
+      #   uses: peter-evans/find-comment@v2
+      #   id: lastComment
+      #   with:
+      #     issue-number: ${{ steps.get_pr_num.outputs.outprnum }}
+      #     comment-author: "github-actions[bot]"
+      #     direction: last
+
+      # # Update a comment PR Thread
+      # - name: Update Comment Thread
+      #   uses: peter-evans/create-or-update-comment@v2
+      #   if: (steps.CatalogAndProductJob.outcome = 'success' || steps.ProductHierarchyMaintenanceJob.outcome = 'success' || steps.ClearManagedPlatformCacheJob.outcome = 'success' || steps.RefreshPlatformCacheFullJob.outcome = 'success' || steps.PopulateApiCacheJob.outcome = 'success')
+      #   with:
+      #     comment-id: ${{ steps.lastComment.outputs.comment-id }}
+      #     issue-number: ${{ steps.get_pr_num.outputs.outprnum }}
+      #     body: |
+      #       + Maintenance Jobs Completed :white_check_mark:

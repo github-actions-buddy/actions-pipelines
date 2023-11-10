@@ -1,0 +1,711 @@
+name: Pipeline Manual Deploy to Environments
+
+# Workflow run name
+run-name: Workflow run No - ${{ github.run_number }} by @${{ github.actor }}
+
+# Workflow triggers
+on:
+  workflow_dispatch:
+    inputs:
+      sourceBranch:
+        description: "Source Branch"
+        required: true
+        type: string
+      targetBranch:
+        description: "Target Branch"
+        required: true
+        type: string
+      bypassRestrictions:
+        description: 'Bypass Branch Restrictions'
+        required: true
+        default: false
+        type: boolean
+      getPRNumber:
+        description: 'Enter the Pull Request Number'
+        required: false
+        type: number
+      sfDeploymentFlag:
+        description: 'Salesforce Metadata Deployment'
+        required: true
+        default: false
+        type: boolean
+      getUnitTests:
+        description: "Test classes to execute"
+        required: false
+        type: string
+      vlocityDeploymentFlag:
+        description: 'Vlocity Deployment'
+        required: true
+        default: false
+        type: boolean
+      targetEnv:
+        description: 'Target Environment for Deployment'
+        default: 'None'
+        type: choice
+        required: true
+        options:
+        - None
+        - DEV-CI
+        - SIT
+        - UAT
+        - STG
+        - PROD
+      
+  # Pull request trigger
+  # pull_request:
+  #   types: [labeled]
+  #   paths-ignore:
+  #     - "**/README.md"
+
+# Environment Variables
+env:
+  GIT_USER_NAME: github
+  GIT_USER_EMAIL: githubactions@mydomain.com
+
+jobs:
+  installation_authenticate_deploy:
+    runs-on: ubuntu-latest
+    # Only executes next steps if Source branch name starts with below conditions
+    # ((startswith(${{inputs.sourceBranch}},'feature') || startswith(${{inputs.sourceBranch}},'develop') || startswith(${{inputs.sourceBranch}},'integration') || startswith(${{inputs.sourceBranch}},'release')) && (github.event_name == 'workflow_dispatch'))
+    environment: ${{ inputs.targetEnv }}
+    if: (github.event_name == 'workflow_dispatch')
+    env:
+      TARGET_ENVIRONMENT: ${{inputs.targetEnv}}
+      SOURCE_BRANCH: ${{inputs.sourceBranch}}
+      TARGET_BRANCH: ${{inputs.targetBranch}}
+      BYPASS_RESTRICTIONS: ${{inputs.bypassRestrictions}}
+      PR_NUMBER: ${{inputs.getPRNumber}}
+      SF_METADATA_DEPLOY: ${{inputs.sfDeploymentFlag}}
+      VLOCITY_DEPLOY: ${{inputs.vlocityDeploymentFlag}}
+      UNIT_TESTS: ${{inputs.getUnitTests}}
+    steps:
+      # Create a PR comment thread
+      - name: Create PR comment Thread
+        uses: peter-evans/create-or-update-comment@v2
+        if: env.PR_NUMBER != ''
+        with:
+          issue-number: ${{env.PR_NUMBER}}
+          body: |
+            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
+            ## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # Find comments in PR
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        if: env.PR_NUMBER != ''
+        id: lastComment
+        with:
+          issue-number: ${{ env.PR_NUMBER }}
+          comment-author: "github-actions[bot]"
+          direction: last
+
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Install required OS packages
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get clean -y
+          sudo apt-get update -y
+          sudo apt --only-upgrade install -y zip
+          sudo apt --only-upgrade install -y curl
+          sudo apt --only-upgrade install -y wget
+          # sudo apt install openjdk-8-jdk -y
+          sudo apt --only-upgrade install jq -y
+          sudo apt --only-upgrade install grep -y
+          sudo apt autoremove -y
+
+      # Setup python v3.7
+      - uses: actions/setup-python@v4
+        name: Install Python v3.7 and cache pip
+        with:
+          python-version: "3.7"
+          cache: "pip" # caching pip dependencies
+          cache-dependency-path: ./acct-scripts/requirements.txt
+
+      # Install requirements.txt from acct-scripts
+      - name: Install requirements.txt
+        run: |
+          ls -l
+          python --version
+          pip --version
+          python3 -m pip install -r "./requirements.txt"
+
+      # Checking out repo before installing Node
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+
+      # Setup Node v18
+      - uses: actions/setup-node@v3
+        name: Install Node v18
+        with:
+          node-version: "18"
+
+      # Install the SFDX-CLI
+      - name: Install SFDX-CLI
+        if: env.SF_METADATA_DEPLOY == 'true'
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          mkdir ~/sfdx && ls -la
+          tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
+          echo "$HOME/sfdx/bin" >> $GITHUB_PATH
+          echo The PATH is $GITHUB_PATH
+          ~/sfdx/bin/sfdx version
+
+      # Install SFDX-Scanner
+      - name: Install SFDX-Scanner
+        if: env.SF_METADATA_DEPLOY == 'true'
+        run: |
+          sfdx plugins:install @salesforce/sfdx-scanner
+
+      # Install Git
+      - name: Install Git
+        run: |
+          sudo apt update
+          sudo apt-get install -y git
+          git --version
+
+      # check env and branch
+      - name: Check branch and env
+        if: env.BYPASS_RESTRICTIONS == 'false'
+        run: |
+          if [ "${{ env.TARGET_ENVIRONMENT }}" == "DEV-CI" ] && [ "${{ inputs.targetBranch }}" != "develop" ]; then
+            echo "::warning:: CI environment can only be used with develop"
+            exit 1
+          elif [[ "${{ env.TARGET_ENVIRONMENT }}" == "SIT" && ! ( "${{ inputs.targetBranch }}" == "release" || "${{ inputs.targetBranch }}" =~ ^releases/v.*$ ) ]]; then
+            echo "::warning:: SIT environment can only be used with release or releases/v* branches"
+            exit 1        
+          elif [ "${{ env.TARGET_ENVIRONMENT }}" == "UAT" ] && [ "${{ inputs.targetBranch }}" != "TBD" ]; then
+            echo "::warning:: UAT environment can only be used with release branch"
+            exit 1
+          elif [ "${{ env.TARGET_ENVIRONMENT }}" == "STG" ] && [ "${{ inputs.targetBranch }}" != "TBD" ]; then
+            echo "::warning:: UAT environment can only be used with release branch"
+            exit 1
+          elif [ "${{ env.TARGET_ENVIRONMENT }}" == "PROD" ] && [ "${{ inputs.targetBranch }}" != "main" ]; then
+            echo "::warning:: PRODUCTION environment can only be used with main branch"
+            exit 1
+          fi
+
+      # Store Auth URL
+      - name: Store the SFDX Auth URL
+        run: |
+          echo "PASS"
+
+      # Authenticate with Auth URL
+      - name: Authenticate SFDX Instance
+        id: sfdxAuthenticate
+        run: |
+          echo "PASS"
+      
+      # Update comment in PR Thread: Salesforce-Auth-Success
+      - name: Update Comment Thread - Salesforce authentication Successful
+        if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='success') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Successful Salesforce authentication :white_check_mark:
+
+      # Update comment in PR Thread: Salesforce-Auth-Success
+      - name: Update Comment Thread - Salesforce authentication Failed
+        if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='failure') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Failure in Salesforce authentication :x:
+
+      # Generate Describe Log
+      - name: Generate Describe Log
+        run: |
+          echo "PASS"
+
+      # Configure a global user for Git
+      - name: Configure Global User for Git
+        run: |
+          git config --global user.email ${{ env.GIT_USER_NAME }}
+          git config --global user.name ${{ env.GIT_USER_EMAIL }}
+          git config --global diff.renameLimit 5000
+          git config core.quotepath off
+
+      # Get the difference in vlocity folder
+      - name: Getting Vlocity Diffs
+        id: VlocityDiff
+        if: env.VLOCITY_DEPLOY == 'true'
+        continue-on-error: true
+        run: |
+          git fetch --all
+          git checkout ${{ env.TARGET_BRANCH }}
+          git checkout ${{ env.SOURCE_BRANCH }}
+      
+      # Read pr_num file
+      - name: Read vlocityDiff
+        if: env.VLOCITY_DEPLOY == 'true'
+        id: get_vlocityDiff
+        run: |
+          vlocityDiff=$(cat ./vlocityDiff.txt)
+          echo "Vloicty Difference between source and target is:"
+          echo "$vlocityDiff"
+
+      # In future if artifact vlocityDiff.txt is needed then uncomment below step
+      # - uses: actions/upload-artifact@v3
+      #   if: (steps.VlocityDiff.outcome == 'success')
+      #   name: Artfifact Upload - ./vlocityDiff.txt
+      #   with:
+      #     name: vlocityDiff.txt
+      #     path: ./vlocityDiff.txt
+      #     retention-days: 15
+
+      # Run the MergeDX
+      - name: MergerDX
+        id: MergerDX
+        if: env.SF_METADATA_DEPLOY == 'true'
+        continue-on-error: true
+        run: |
+          if [ $? -eq 0 ] && [ $(ls srcToDeploy | wc -l) -ne 0 ]; then
+            echo "Success in MergeDX"
+          else 
+            echo "::warning:: Failure in MergeDX: The srcToDeploy.zip is EMPTY(i.e. No New Code Changes Detected)"
+            exit 1
+          fi
+
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        if: (steps.MergerDX.outcome != 'success' && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Delta Package not built. :x:
+
+      # Echo if MergerDX script fails
+      - name: Pipeline Delta Package did not built
+        if: (steps.MergerDX.outcome != 'success')
+        run: |
+          echo "::warning::Step MegerDX Failed: Delta Package not built"
+
+      # Upload the output to ./srcToDeploy.zip
+      - uses: actions/upload-artifact@v3
+        if: (steps.MergerDX.outcome == 'success')
+        name: Artfifact Upload - ./srcToDeploy.zip
+        with:
+          name: srcToDeploy.zip
+          path: ./srcToDeploy.zip
+          retention-days: 15
+
+      # Update a comment PR Thread for Build-Success
+      - name: Update Comment Thread - Delta Package Built Successfully
+        if: ((github.event_name == 'workflow_dispatch') && steps.MergerDX.outcome == 'success' && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Delta Package Built Successfully srcToDeploy.zip :white_check_mark:
+              Navigate to workflow run URL: [1] :white_check_mark:
+
+      # Run the Nomenclature script on ./srcToDeploy
+      - name: Nomenclature Check
+        if: (steps.MergerDX.outcome == 'success')
+        id: nomenclatureValidation
+        run: |
+          python3 ./acct-scripts/nomenclatureCheck/nomenclatureCheck.py ./srcToDeploy
+
+      # Upload Artifact nomenclature-errors.html
+      - uses: actions/upload-artifact@v3
+        name: Artifact Upload - ./nomenclature-errors.html
+        with:
+          name: nomenclatureErrorsReport
+          path: ./nomenclature-errors.html
+          retention-days: 15
+
+      # Update a comment in PR Thread: Nomenclature-Success
+      - name: Update Comment Thread - Nomenclature validation build succesfully
+        if: (steps.nomenclatureValidation.outcome == 'success' && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Nomenclature validation build succesfully :white_check_mark:
+
+      # Update a comment in PR Thread: Nomenclature-Fails
+      - name: Update Comment Thread - Nomenclature validation failed
+        if: (steps.MergerDX.outcome == 'success' && steps.nomenclatureValidation.outcome != 'success' && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Nomenclature validation failed. :x:
+
+      # Scan the code with SFDX-scanner
+      - name: Run SFDX Scanner
+        id: sfdxScanner
+        if: (steps.MergerDX.outcome == 'success')
+        run: |
+          echo "PASS"
+
+      # Upload sfdxScannerReport.html
+      - uses: actions/upload-artifact@v3
+        if: (steps.sfdxScanner.outcome == 'success')
+        name: Artifact Upload - ./sfdxScannerReport.html
+        with:
+          name: sfdxScannerReport.html
+          path: ./sfdxScannerReport.html
+          retention-days: 15
+
+      # Find unit tests defined in the PR Body version 2
+      - name: Find Unit Tests
+        if: (steps.MergerDX.outcome == 'success')
+        id: regex-match
+        run: |
+          echo ${{env.UNIT_TESTS}}
+          # echo 'testsToBeRun ALT_ActivationOrderCreation_Test, ALT_BATCH_ResumptionOrder_Test, ALT_BasketOperations_Test, ALT_CLS_AutomaticCaseCloseBatchTest, ALT_CLS_CITriggerHelper_Test, ALT_CLS_CaseAssgmentRulesUsingFlowTest, ALT_CLS_CaseTimeline_Test, ALT_CLS_CommunicationUtilsTest, ALT_CLS_ContactHandlerTest, ALT_CLS_CreateAttachmentFlow_Test, ALT_CLS_CreateContactFlowByPassRuleTest, ALT_CLS_CreateContactUsingFlowTest, ALT_CLS_CustomerInteractionTimeline_Test, ALT_CLS_DnisHandler_Test, ALT_CLS_EmailClosure_Test, ALT_CLS_EntryDoorHandler_Test, ALT_CLS_GDPRVisualizerHandlerTEST, ALT_CLS_GetContactFromTabControllerTest, ALT_CLS_LookupAccount_Test, ALT_CLS_Lookup_Test, ALT_CLS_SendCommunicationFromAFlowTest, ALT_CLS_TransferedCITimeline_Test, ALT_CLS_TreatmentArea_Handler_Test, ALT_CLS_UpdateContactFlowByPassRuleTest, ALT_CLS_UpdateContactUsingFlowTest, ALT_CallCommunicationClassTest, ALT_ChangeOrdStateTriggerHandlerTest, ALT_ChangeOrdStateTriggerHandler_Test, ALT_Controller_Promotion_Test, ALT_CopyBaseChargePricingPlanStep_Test, ALT_CustFuncParentFrlDetails_Test, ALT_CustomDRFunctionsTest, ALT_CustomFunctionClsTest, ALT_CustomFunctionReplace_Test, ALT_CustomGetOffersRHandler_Test, ALT_DCAPIParamsImplementation_Test, ALT_DI_ActivationOrderCreationCtrl_Test, ALT_DOMAIN_AttributePricingMatrixRowTest, ALT_DOMAIN_AttributePricingMatrix_Test, ALT_DOMAIN_CommercialAttribute_Test, ALT_DOMAIN_CommercialAttributes_Test, ALT_DOMAIN_Offer_Test, ALT_DOMAIN_Offers_Test, ALT_DOMAIN_Price_Test, ALT_DOMAIN_Prices_Test, ALT_DOMAIN_Product_Test, ALT_DOMAIN_Products_Test, ALT_DOMAIN_Promotion_Test, ALT_DOMAIN_Promotions_Test, ALT_DOMAIN_RecordType_Test, ALT_DigitalGenerateDocument_Test, ALT_ErrorLogRecordingInsert_Test, ALT_FACTORY_Offer_Test, ALT_FindandReplaceTest, ALT_FindandReplace_Test, ALT_GeneralUtilities_Test, ALT_Globalidupdatesync_Test, ALT_IMPLEMENTATION_GetOffersHandler_Test, ALT_IndustriesDataUtilities_Test, ALT_IntegProcedureSysInterface_Test, ALT_OCSUpdateInventoryItem_Test, ALT_PricingMatrixService_Test, ALT_PricingVariableMapHook_Test, ALT_Rest_ListUserPortfolioTest, ALT_SendSMSClassTest, ALT_TRG_ActOrderCreation_Handler_Test, ALT_TRG_CaseTypificationHelper_Test, ALT_TRG_Handler_Test, ALT_TRG_ModificationOrderCrt_HandlerTest, ALT_UpdateFrlAttributes_Test, ALT_customErrorUtilitiesTest, ALT_customUtilitiesTest, ALT_getPromoDiscDetails_Test, CustomPricingPlanStepImplTest, ValidateNewCustomerCreationTest, gl_WorkspaceConnectorControllerHdl_Test, gl_WorkspaceConnectorController_Test' > pullRequestBody.txt
+          # python3 ./acct-scripts/readPRBody/readPRBody.py -s pullRequestBody.txt
+
+      # Print ENV PR_TESTS
+      # - name: Echo PR_TESTS
+      #   run: echo ${{env.PR_TESTS}}
+
+      # Update a comment in PR Thread: If unit tests are defined otherwise skip this step
+      - name: Update Comment Thread - Unit Tests to be run
+        if: (env.UNIT_TESTS != '' && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Unit Tests to be run: ${{ env.UNIT_TESTS }}
+
+      # Setting up sfdx force:source:deploy based on the unit tests for the validate and deploy
+      # If unit tests are present then first run those unit test and then deploy
+      # If unit tests are absent then print No tests to run
+      - name: Test Composition
+        # id: testString
+        # echo ::set-output name=TEST_STRING::$testString
+        run: |
+          testToRun='${{env.UNIT_TESTS}}';
+          if [ -z "$testToRun" ]; then
+            testString=''
+            echo "No Test to run"
+          else
+            testString='-l RunSpecifiedTests -r "${{env.UNIT_TESTS}}"'
+          fi
+          echo "TEST_STRING=$testString" >> $GITHUB_ENV
+
+      # Load specific Variables to this Enviroment
+      - name: SFDX Load Dynamic Vars
+        id: sfdxDynoVar
+        if: (steps.MergerDX.outcome == 'success')
+        continue-on-error: true
+        run: source ORGS/.env.${{ env.TARGET_ENVIRONMENT }}
+
+      # SFDX deploy cmd with check only flag, for unit tests execution
+      - name: SFDX Validate
+        id: sfdxValidate
+        if: (steps.MergerDX.outcome == 'success')
+        continue-on-error: true
+        run: |
+          echo "PASS"
+
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate_CI.json
+        id: sfdxValidateArtifact_CI
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: validate_CI.json
+          path: ./validate_CI.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate_SIT.json
+        id: sfdxValidateArtifact_SIT
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: validate_SIT.json
+          path: ./validate_SIT.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate_UAT.json
+        id: sfdxValidateArtifact_UAT
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: validate_UAT.json
+          path: ./validate_UAT.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate_STG.json
+        id: sfdxValidateArtifact_STG
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: validate_STG.json
+          path: ./validate_STG.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate_PROD.json
+        id: sfdxValidateArtifact_PROD
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: validate_PROD.json
+          path: ./validate_PROD.json
+          retention-days: 15
+
+      # Parse json to extract Status and ID
+      - name: Parse json output
+        #echo ::set-output name=SfdxValidateStatusCode::$statusCode
+        #echo ::set-output name=resultID::$resultId
+        id: parseJson
+        if: (steps.sfdxValidateArtifact_CI.outcome == 'success' || steps.sfdxValidateArtifact_SIT.outcome == 'success' || steps.sfdxValidateArtifact_UAT.outcome == 'success' || steps.sfdxValidateArtifact_PROD.outcome == 'success')
+        run: |
+          exit 0
+
+      # Update a comment in PR Thread: Validation-success
+      - name: Update Comment Thread - SFDX Validate Success
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Validate Success :white_check_mark:
+
+      # Set PullRequest Status
+      - name: Set PR Status
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: success
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "SFDX Validation success. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Update a comment in PR Thread: Validation-failed
+      - name: Update comment - SFDX Validate Failed
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Validate Failed :x:
+
+      # Set PullRequest Status
+      - name: Set PR Status
+        if: (steps.parseJsonUAT.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{github.event.pull_request.number}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Validate fails, check artifact. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Stop the pipeline because unit tests are failed
+      - name: Cancel Pipeline Validate Fails
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0))
+        run: |
+          echo "::error::SFDX Validation Failed: Stop pipeline"
+          exit 1
+
+      # Run force:source:deploy if unit tests executes successfully
+      - name: SFDX Quick Deploy
+        id: sfdxQuickDeploy
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && env.TEST_STRING != '')
+        run: |
+          exit 0
+
+      # Run force:source:deploy if unit tests not present
+      - name: SFDX Deploy
+        id: sfdxDeploy
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && env.TEST_STRING == '')
+        run: |
+          echo "PASS"
+
+      # Update a comment in PR Thread: Deployment-success
+      - name: Update Comment Thread - SFDX Deploy comment Success
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            + Deployment Success :white_check_mark:
+
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy_CI.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_CI.json
+          path: ./deploy_CI.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy_SIT.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_SIT.json
+          path: ./deploy_SIT.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy_UAT.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_UAT.json
+          path: ./deploy_UAT.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy_STG.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_STG.json
+          path: ./deploy_STG.json
+          retention-days: 15
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy_PROD.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_PROD.json
+          path: ./deploy_PROD.json
+          retention-days: 15
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Update Comment Thread - SFDX Deploy Failure
+        if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Deployment Failed :x:
+
+      # Set PullRequest Status
+      - name: Set PR Status
+        if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Deploy fails, check artifacts. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Stop the pipeline if force:source:deploy fails
+      - name: Cancel Pipeline Deploy Fails
+        if: (steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure')
+        run: |
+          echo "::error::SFDX Deploy Failed: Stop pipeline"
+          exit 1
+      
+      # Install Puppeteer
+      - name: Install Puppeteer
+        if: env.VLOCITY_DEPLOY == 'true'
+        run: |
+          ls -l
+          npm install puppeteer -g
+      
+      # Install Vlocity
+      - name: Install Vlocity
+        if: env.VLOCITY_DEPLOY == 'true'
+        run: |
+          npm install --global vlocity
+          vlocity --version
+
+      # Deploy the difference in vlocity folder to instance
+      - name: Deploy Vlocity
+        id: vlocityDeploy
+        if: ((env.VLOCITY_DEPLOY == 'true') && (steps.VlocityDiff.outcome == 'failure') && (github.event_name == 'workflow_dispatch'))
+        continue-on-error: true
+        run: |
+          echo "PASS"
+
+      # Upload the output to ./VlocityBuildErrors.log
+      - uses: actions/upload-artifact@v3
+        if: (steps.vlocityDeploy.outcome == 'failure' && (github.event_name == 'workflow_dispatch'))
+        name: Artifact Upload - Vlocity build Errors
+        with:
+          name: VlocityBuildErrors.log
+          path: ./VlocityBuildErrors.log
+          retention-days: 15
+
+      # Update a comment in PR Thread: Vlocity-failed
+      - name: Update Comment Thread - Vlocity Failure
+        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Vlocity Deployment Failed :x:
+
+      # Update a comment in PR Thread: Vlocity-Success
+      - name: Update Comment Thread - Vlocity Success
+        if: ((steps.vlocityDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.lastComment.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            + Vlocity Deployment Success :white_check_mark:
+
+      # Set PullRequest Status
+      - name: Set PR Status
+        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Vlocity fails, check buildLog. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Stop the pipeline if vlocity deploy fails
+      - name: Cancel Pipeline Vlocity Fails
+        if: (steps.vlocityDeploy.outcome == 'failure' && (github.event_name == 'workflow_dispatch'))
+        run: |
+          echo "::error::vlocity Deploy Failed: Stop pipeline"
+          exit 1
+
+      # Set Pull Request Status
+      - name: Set PR Status
+        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: success
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Build #${{github.run_number}} succesfully ends. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Approve PR to merge
+      - name: Approve Pull Request
+        if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: juliangruber/approve-pull-request-action@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{env.PR_NUMBER}}

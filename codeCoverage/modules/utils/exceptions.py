@@ -11,3 +11,9 @@ class NoTestData(Exception):
 
     def __init__(self):
         super().__init__( 'Report does not contain code coverage data' )
+
+class ExitCode(Exception):
+    EXIT_CODE = 100
+
+    def __init__(self):
+        super().__init__( 'SF APEX RUN TEST COMMAND FINSIHED' )
