@@ -27,7 +27,7 @@ on:
       sfDeploymentFlag:
         description: 'Salesforce Metadata Deployment'
         required: true
-        # default: false
+        default: false
         type: boolean
       getUnitTests:
         description: "Test classes to execute"
@@ -36,7 +36,7 @@ on:
       vlocityDeploymentFlag:
         description: 'Vlocity Deployment'
         required: true
-        # default: false
+        default: false
         type: boolean
       targetEnv:
         description: 'Target Environment for Deployment'
@@ -78,7 +78,6 @@ jobs:
       SF_METADATA_DEPLOY: ${{inputs.sfDeploymentFlag}}
       VLOCITY_DEPLOY: ${{inputs.vlocityDeploymentFlag}}
       UNIT_TESTS: ${{inputs.getUnitTests}}
-      GET_USERNAME: ${{github.actor}}
     steps:
       # Create a PR comment thread
       - name: Create PR comment Thread
@@ -86,8 +85,8 @@ jobs:
         if: env.PR_NUMBER != ''
         with:
           issue-number: ${{env.PR_NUMBER}}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
+            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -101,7 +100,6 @@ jobs:
           issue-number: ${{ env.PR_NUMBER }}
           comment-author: "github-actions[bot]"
           direction: last
-          token: ${{ secrets.V_METADATA_SEC }}
 
       # Checkout the current repository
       - name: Checkout Repository
@@ -126,7 +124,7 @@ jobs:
         with:
           python-version: "3.7"
           cache: "pip" # caching pip dependencies
-          cache-dependency-path: ./requirements.txt
+          cache-dependency-path: ./acct-scripts/requirements.txt
 
       # Install requirements.txt from acct-scripts
       - name: Install requirements.txt
@@ -201,10 +199,6 @@ jobs:
         id: sfdxAuthenticate
         run: |
           echo "PASS"
-
-      - name: Print Username
-        run: |
-          echo "${{env.GET_USERNAME}}"
       
       # Update comment in PR Thread: Salesforce-Auth-Success
       - name: Update Comment Thread - Salesforce authentication Successful
@@ -213,7 +207,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Successful Salesforce authentication :white_check_mark:
 
@@ -224,7 +217,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Failure in Salesforce authentication :x:
 
@@ -250,7 +242,6 @@ jobs:
           git fetch --all
           git checkout ${{ env.TARGET_BRANCH }}
           git checkout ${{ env.SOURCE_BRANCH }}
-          exit 1
       
       # Read pr_num file
       - name: Read vlocityDiff
@@ -276,12 +267,9 @@ jobs:
         if: env.SF_METADATA_DEPLOY == 'true'
         continue-on-error: true
         run: |
-          exit 0
-          if [ $? -eq 0 ]; then
+          if [ $? -eq 0 ] && [ $(ls srcToDeploy | wc -l) -ne 0 ]; then
             echo "Success in MergeDX"
-            zip -r srcToDeploy.zip ./codeCoverage
-            git rev-parse --verify HEAD
-          else
+          else 
             echo "::warning:: Failure in MergeDX: The srcToDeploy.zip is EMPTY(i.e. No New Code Changes Detected)"
             exit 1
           fi
@@ -293,7 +281,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Delta Package not built. :x:
 
@@ -319,7 +306,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Delta Package Built Successfully srcToDeploy.zip :white_check_mark:
               Navigate to workflow run URL: [1] :white_check_mark:
@@ -329,7 +315,7 @@ jobs:
         if: (steps.MergerDX.outcome == 'success')
         id: nomenclatureValidation
         run: |
-          echo "PASS"
+          python3 ./acct-scripts/nomenclatureCheck/nomenclatureCheck.py ./srcToDeploy
 
       # Upload Artifact nomenclature-errors.html
       - uses: actions/upload-artifact@v3
@@ -346,7 +332,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Nomenclature validation build succesfully :white_check_mark:
 
@@ -357,7 +342,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Nomenclature validation failed. :x:
 
@@ -397,7 +381,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Unit Tests to be run: ${{ env.UNIT_TESTS }}
 
@@ -435,7 +418,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_CI.json
         id: sfdxValidateArtifact_CI
-        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'DEV-CI')
+        if: (steps.sfdxValidate.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
           name: validate_CI.json
@@ -444,7 +427,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_SIT.json
         id: sfdxValidateArtifact_SIT
-        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'SIT')
+        if: (steps.sfdxValidate.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
           name: validate_SIT.json
@@ -453,7 +436,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_UAT.json
         id: sfdxValidateArtifact_UAT
-        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'UAT')
+        if: (steps.sfdxValidate.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
           name: validate_UAT.json
@@ -462,7 +445,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_STG.json
         id: sfdxValidateArtifact_STG
-        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'STG')
+        if: (steps.sfdxValidate.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
           name: validate_STG.json
@@ -471,7 +454,7 @@ jobs:
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./validate_PROD.json
         id: sfdxValidateArtifact_PROD
-        if: (steps.sfdxValidate.outcome != 'skipped' && env.TARGET_ENVIRONMENT == 'PROD')
+        if: (steps.sfdxValidate.outcome != 'skipped')
         uses: actions/upload-artifact@v3
         with:
           name: validate_PROD.json
@@ -494,21 +477,21 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Validate Success :white_check_mark:
 
-      # # Set PullRequest Status
-      # - name: Set PR Status
-      #   if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
-      #   uses: teamniteo/pull_request_status_action@v1.0.0
-      #   with:
-      #     pr_number: ${{env.PR_NUMBER}}
-      #     state: success
-      #     repository: ${{ github.repository }}
-      #     context: Build Nº ${{github.run_number}}
-      #     description: "SFDX Validation success. "
-      #     token: ${{ secrets.V_METADATA_SEC }}
+      # Set PullRequest Status
+      - name: Set PR Status
+        if: (steps.parseJson.outcome == 'success' && (env.SfdxValidateStatusCodeCI == 0 || env.SfdxValidateStatusCodeSIT == 0 || env.SfdxValidateStatusCodeUAT == 0 || env.SfdxValidateStatusCodePROD == 0) && github.event_name == 'workflow_dispatch' && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: success
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "SFDX Validation success. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Update a comment in PR Thread: Validation-failed
       - name: Update comment - SFDX Validate Failed
@@ -517,21 +500,21 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Validate Failed :x:
 
       # Set PullRequest Status
-      # - name: Set PR Status
-      #   if: (steps.parseJsonUAT.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-      #   uses: teamniteo/pull_request_status_action@v1.0.0
-      #   with:
-      #     pr_number: ${{github.event.pull_request.number}}
-      #     state: error
-      #     repository: ${{ github.repository }}
-      #     context: Build Nº ${{github.run_number}}
-      #     description: "Validate fails, check artifact. "
-      #     token: ${{ secrets.V_METADATA_SEC }}
+      - name: Set PR Status
+        if: (steps.parseJsonUAT.outcome == 'success' && (env.SfdxValidateStatusCodeCI != 0 || env.SfdxValidateStatusCodeSIT != 0 || env.SfdxValidateStatusCodeUAT != 0 || env.SfdxValidateStatusCodePROD != 0) && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{github.event.pull_request.number}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Validate fails, check artifact. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Stop the pipeline because unit tests are failed
       - name: Cancel Pipeline Validate Fails
@@ -560,14 +543,13 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
+          issue-number: ${{ github.event.pull_request.number }}
           body: |
             + Deployment Success :white_check_mark:
 
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_CI.json
-        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'DEV-CI')
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_CI.json
@@ -575,7 +557,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_SIT.json
-        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'SIT')
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_SIT.json
@@ -583,7 +565,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_UAT.json
-        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'UAT')
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_UAT.json
@@ -591,7 +573,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_STG.json
-        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'STG')
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_STG.json
@@ -599,7 +581,7 @@ jobs:
           retention-days: 15
       # Upload the output of force:sorce:deploy cmd in json file
       - name: Artifact Upload - ./deploy_PROD.json
-        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && env.TARGET_ENVIRONMENT == 'PROD')
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
         uses: actions/upload-artifact@v3
         with:
           name: deploy_PROD.json
@@ -617,16 +599,17 @@ jobs:
             + Deployment Failed :x:
 
       # Set PullRequest Status
-      # - name: Set PR Status
-      #   if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-      #   uses: teamniteo/pull_request_status_action@v1.0.0
-      #   with:
-      #     pr_number: ${{env.PR_NUMBER}}
-      #     state: error
-      #     repository: ${{ github.repository }}
-      #     context: Build Nº ${{github.run_number}}
-      #     description: "Deploy fails, check artifacts. "
-      #     token: ${{ secrets.V_METADATA_SEC }}
+      - name: Set PR Status
+        if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Deploy fails, check artifacts. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Stop the pipeline if force:source:deploy fails
       - name: Cancel Pipeline Deploy Fails
@@ -673,7 +656,6 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Vlocity Deployment Failed :x:
 
@@ -684,21 +666,21 @@ jobs:
         with:
           comment-id: ${{ steps.lastComment.outputs.comment-id }}
           issue-number: ${{ env.PR_NUMBER }}
-          token: ${{ secrets.V_METADATA_SEC }}
           body: |
             + Vlocity Deployment Success :white_check_mark:
 
       # Set PullRequest Status
-      # - name: Set PR Status
-      #   if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-      #   uses: teamniteo/pull_request_status_action@v1.0.0
-      #   with:
-      #     pr_number: ${{env.PR_NUMBER}}
-      #     state: error
-      #     repository: ${{ github.repository }}
-      #     context: Build Nº ${{github.run_number}}
-      #     description: "Vlocity fails, check buildLog. "
-      #     token: ${{ secrets.V_METADATA_SEC }}
+      - name: Set PR Status
+        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: error
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Vlocity fails, check buildLog. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Stop the pipeline if vlocity deploy fails
       - name: Cancel Pipeline Vlocity Fails
@@ -708,21 +690,22 @@ jobs:
           exit 1
 
       # Set Pull Request Status
-      # - name: Set PR Status
-      #   if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-      #   uses: teamniteo/pull_request_status_action@v1.0.0
-      #   with:
-      #     pr_number: ${{env.PR_NUMBER}}
-      #     state: success
-      #     repository: ${{ github.repository }}
-      #     context: Build Nº ${{github.run_number}}
-      #     description: "Build #${{github.run_number}} succesfully ends. "
-      #     token: ${{ secrets.V_METADATA_SEC }}
+      - name: Set PR Status
+        if: ((steps.vlocityDeploy.outcome == 'failure') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: teamniteo/pull_request_status_action@v1.0.0
+        with:
+          pr_number: ${{env.PR_NUMBER}}
+          state: success
+          repository: ${{ github.repository }}
+          context: Build Nº ${{github.run_number}}
+          description: "Build #${{github.run_number}} succesfully ends. "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Approve PR to merge
-      # - name: Approve Pull Request
-      #   if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
-      #   uses: juliangruber/approve-pull-request-action@v2.0.0
-      #   with:
-      #     token: ${{ secrets.V_METADATA_SEC }}
-      #     number: ${{env.PR_NUMBER}}
+      - name: Approve Pull Request
+        if: ((steps.vlocityDeploy.outcome == 'success' || steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'workflow_dispatch') && env.PR_NUMBER != '')
+        uses: juliangruber/approve-pull-request-action@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{env.PR_NUMBER}}

@@ -1,0 +1,1826 @@
+import json
+import requests
+from datetime import datetime
+
+
+# Constants
+URL_BASE = "https://api.github.com/repos/AlticeGroupIT/acct-sf-metadata/pulls"
+HEADERS = {'Authorization': 'Bearer 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'}
+FILENAME = 'githubPR.json'
+
+def fetch_pull_requests(page):
+    """Fetches pull requests from the specified page."""
+    params = {
+        "state": "all",
+        "sort": "created",
+        "per_page": 100,
+        "page": page
+    }
+    response = requests.get(URL_BASE, headers=HEADERS, params=params)
+    response.raise_for_status()  # Raises an exception if the request fails
+    return response.json()
+
+def fetch_all_pull_requests():
+    """Fetches all pull requests."""
+    pull_requests = []
+    for i in range(50):
+        data = fetch_pull_requests(i)
+        if data:
+            print(f"Data found on page {i}; analyzing...")
+            pull_requests.extend(data)
+        else:
+            break
+    return pull_requests
+
+def filter_pull_requests(pull_requests, start_date, end_date):
+    """Filters pull requests that were merged between the start and end dates."""
+    # Convert dates to datetime objects
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    filtered_pull_requests = []
+
+    for pr in pull_requests:
+        # Check if the pull request was merged
+        if pr["merged_at"]:
+            # Convert the merge date to a datetime object
+            merge_date = datetime.strptime(pr["merged_at"], "%Y-%m-%dT%H:%M:%SZ")
+
+            # Check if the merge date is within the specified range
+            if start_date <= merge_date <= end_date:
+                filtered_pull_requests.append(pr)
+
+    return filtered_pull_requests
+
+def write_to_file(data, filename):
+    """Writes data to a file in JSON format."""
+    with open(filename, 'w') as f:
+        json.dump(data, f)
+
+def main():
+    """Main function of the script."""
+    pull_requests = fetch_all_pull_requests()
+    write_to_file(pull_requests, FILENAME)
+    print("All PRs have been fetched.")
+    
+    # ------------ Uncomment to filter by date ------------
+    # start_date = "2023-01-01"
+    # end_date = "2023-12-31"
+    # filtered_pull_requests = filter_pull_requests(pull_requests, start_date, end_date)
+    # print(filtered_pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>PR Number</th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th>Created Date</th>
+                        <th>Merged Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+
+    for pr in pull_requests:
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v3
+
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th><a href="#" onclick="sortTable(0)">PR Number</a></th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th><a href="#" onclick="sortTable(1)">Created Date</a></th>
+                        <th><a href="#" onclick="sortTable(2)">Merged Date</a></th>
+                        <th>PR State</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+
+    for pr in pull_requests:
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr['state']}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.querySelector("table");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v4
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th><div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div> PR Number</th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th><div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div> Created Date</th>
+                        <th><div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div> Merged Date</th>
+                        <th><div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div> PR State</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.querySelector("table");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("td")[n];
+                    y = rows[i + 1].getElementsByTagName("td")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v5
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th><div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div> PR Number</th>
+                        <th>PR Title</th>
+                        <th>PR Author</th>
+                        <th><div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div> Created Date</th>
+                        <th><div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div> Merged Date</th>
+                        <th><div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div> PR State</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+        """
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            // Sorting logic here
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v6
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+            float: right;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th>PR Number <div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Title <div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Author <div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Created Date <div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Merged Date <div class="arrow" onclick="sortTable(4)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR State <div class="arrow" onclick="sortTable(5)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    pr_numbers = set()
+
+    for pr in pull_requests:
+        if pr['number'] not in pr_numbers:
+            pr_state = determine_pr_state(pr)
+            html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+            """
+            pr_numbers.add(pr['number'])
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            // Sorting logic here
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v7
+import json
+from datetime import datetime
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+        .arrow {
+            cursor: pointer;
+            float: right;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th>PR Number <div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Title <div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR Author <div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Created Date <div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>Merged Date <div class="arrow" onclick="sortTable(4)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th>PR State <div class="arrow" onclick="sortTable(5)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    pr_numbers = set()
+
+    for pr in pull_requests:
+        if pr['number'] not in pr_numbers:
+            pr_state = determine_pr_state(pr)
+            html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                        <td>{pr_state}</td>
+                    </tr>
+            """
+            pr_numbers.add(pr['number'])
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            var arrow = document.getElementsByClassName("arrow")[n];
+            var shouldSwitch = true;
+            var dir = "asc";
+            while (shouldSwitch) {
+                shouldSwitch = false;
+                var rows = prTable.rows;
+                var switching = true;
+                var shouldSwitch = false;
+                var switchcount = 0;
+                while (switching) {
+                    switching = false;
+                    for (var i = 1; i < (rows.length - 1); i++) {
+                        var x = rows[i].getElementsByTagName("td")[n];
+                        var y = rows[i + 1].getElementsByTagName("td")[n];
+                        var xValue = x.innerText || x.textContent;
+                        var yValue = y.innerText || y.textContent;
+                        if (dir == "asc") {
+                            if (xValue.toLowerCase() > yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (xValue.toLowerCase() < yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        switching = true;
+                        if (switchcount >= 20) {
+                            break;
+                        }
+                    } else {
+                        if (dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+                if (dir == "asc") {
+                    arrow.innerHTML = '<span>&#9650;</span><span>&#9660;</span>';
+                } else {
+                    arrow.innerHTML = '<span>&#9660;</span><span>&#9650;</span>';
+                }
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v8
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .arrow {
+            cursor: pointer;
+            float: right;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number <div class="arrow" onclick="sortTable(0)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 20%;">PR Title <div class="arrow" onclick="sortTable(1)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 15%;">PR Author <div class="arrow" onclick="sortTable(2)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 15%;">Created Date <div class="arrow" onclick="sortTable(3)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 15%;">Merged Date <div class="arrow" onclick="sortTable(4)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 15%;">PR State <div class="arrow" onclick="sortTable(5)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                        <th style="width: 10%;">Days Open <div class="arrow" onclick="sortTable(6)"><span>&#9650;</span><span>&#9660;</span></div></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+pr_numbers = set()
+
+for pr in pull_requests:
+    if pr['number'] not in pr_numbers:
+        pr_state = determine_pr_state(pr)
+        if pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+            days_open = calculate_days_open(pr['created_at'])
+        else:
+            days_open = 'N/A'
+        html_content += f"""
+                <tr>
+                    <td>{pr['number']}</td>
+                    <td>{pr['title']}</td>
+                    <td>{pr['user']['login']}</td>
+                    <td>{pr['created_at']}</td>
+                    <td>{pr['merged_at'] if pr['merged_at'] else 'Not Merged'}</td>
+                    <td>{pr_state}</td>
+                    <td>{days_open}</td>
+                </tr>
+        """
+        pr_numbers.add(pr['number'])
+
+html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            var arrow = document.getElementsByClassName("arrow")[n];
+            var shouldSwitch = true;
+            var dir = "asc";
+            while (shouldSwitch) {
+                shouldSwitch = false;
+                var rows = prTable.rows;
+                var switching = true;
+                var shouldSwitch = false;
+                var switchcount = 0;
+                while (switching) {
+                    switching = false;
+                    for (var i = 1; i < (rows.length - 1); i++) {
+                        var x = rows[i].getElementsByTagName("td")[n];
+                        var y = rows[i + 1].getElementsByTagName("td")[n];
+                        var xValue = x.innerText || x.textContent;
+                        var yValue = y.innerText || y.textContent;
+                        if (dir == "asc") {
+                            if (xValue.toLowerCase() > yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (xValue.toLowerCase() < yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        switching = true;
+                        if (switchcount >= 20) {
+                            break;
+                        }
+                    } else {
+                        if (dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+                if (dir == "asc") {
+                    arrow.innerHTML = '<span>&#9650;</span><span>&#9660;</span>';
+                } else {
+                    arrow.innerHTML = '<span>&#9660;</span><span>&#9650;</span>';
+                }
+           
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+with open(HTML_FILENAME, 'w') as file:
+    file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+v9
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 10%;">Days Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+# Rest of the code
+
+with open(HTML_FILENAME, 'w') as file:
+    file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+fix v8 version
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def generate_html_template(pull_requests):
+    """Generates an HTML template for the pull requests."""
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 10%;">Days Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+# Rest of the code
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function sortTable(n) {
+            var arrow = document.getElementsByClassName("arrow")[n];
+            var shouldSwitch = true;
+            var dir = "asc";
+            while (shouldSwitch) {
+                shouldSwitch = false;
+                var rows = prTable.rows;
+                var switching = true;
+                var shouldSwitch = false;
+                var switchcount = 0;
+                while (switching) {
+                    switching = false;
+                    for (var i = 1; i < (rows.length - 1); i++) {
+                        var x = rows[i].getElementsByTagName("td")[n];
+                        var y = rows[i + 1].getElementsByTagName("td")[n];
+                        var xValue = x.innerText || x.textContent;
+                        var yValue = y.innerText || y.textContent;
+                        if (dir == "asc") {
+                            if (xValue.toLowerCase() > yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (xValue.toLowerCase() < yValue.toLowerCase()) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                shouldSwitch = true;
+                                switchcount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        switching = true;
+                        if (switchcount >= 20) {
+                            break;
+                        }
+                    } else {
+                        if (dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+                if (dir == "asc") {
+                    arrow.innerHTML = '<span>&#9650;</span><span>&#9660;</span>';
+                } else {
+                    arrow.innerHTML = '<span>&#9660;</span><span>&#9650;</span>';
+                }
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+with open(HTML_FILENAME, 'w') as file:
+    file.write(html_content)
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    print("All PRs have been fetched.")
+
+    # Generate HTML template
+    generate_html_template(pull_requests)
+
+# Runs the main function if the script is run directly
+if __name__ == "__main__":
+    main()
+
+another fix
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 10%;">Days Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    # Rest of the code
+
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        // ... (rest of the script)
+
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()
+
+v10
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(created_at):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").date()
+    today = date.today()
+    return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+    
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 10%;">Days Open</th>
+                        <th style="width: 15%;">Days Since Created</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        days_open = calculate_days_open(pr['created_at'])
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else ''}</td>
+                        <td>{pr_state}</td>
+                        <td>{days_open}</td>
+                        <td>{days_open}</td>
+                    </tr>
+"""
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()
+
+v11
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(pr):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(pr['created_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+    if pr['closed_at']:
+        closed_date = datetime.strptime(pr['closed_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (closed_date - created_date).days
+    elif pr['merged_at']:
+        merged_date = datetime.strptime(pr['merged_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (merged_date - created_date).days
+    else:
+        today = date.today()
+        return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            max-width: 300px;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 15%;">Number of days PR Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        days_open = calculate_days_open(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else ''}</td>
+                        <td>{pr_state}</td>
+                        <td>{days_open}</td>
+                    </tr>
+"""
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()
+
+v12
+import json
+from datetime import datetime, date
+
+# Constants
+FILENAME = 'githubPR.json'
+HTML_FILENAME = 'githubPR.html'
+
+def determine_pr_state(pr):
+    """Determines the state of the PR based on the dates."""
+    if pr['merged_at']:
+        return 'Merged'
+    elif pr['closed_at'] and not pr['merged_at']:
+        return 'Closed'
+    elif pr['created_at'] and not pr['closed_at'] and not pr['merged_at']:
+        return 'Open'
+    else:
+        return 'Unknown'
+
+def calculate_days_open(pr):
+    """Calculates the number of days since the PR is open."""
+    created_date = datetime.strptime(pr['created_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+    if pr['closed_at']:
+        closed_date = datetime.strptime(pr['closed_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (closed_date - created_date).days
+    elif pr['merged_at']:
+        merged_date = datetime.strptime(pr['merged_at'], "%Y-%m-%dT%H:%M:%SZ").date()
+        return (merged_date - created_date).days
+    else:
+        today = date.today()
+        return (today - created_date).days
+
+def main():
+    """Main function of the script."""
+    with open(FILENAME, 'r') as f:
+        pull_requests = json.load(f)
+
+    # Generate HTML template
+    html_content = """
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            word-wrap: break-word;
+            padding: 10px;
+        }
+        .thead-blue {
+            background-color: #0078d4;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3 mb-4">Pull Request Dashboard</h1>
+        <div class="table-responsive">
+            <table id="prTable" class="table table-bordered table-striped">
+                <thead class="thead-blue">
+                    <tr>
+                        <th style="width: 10%;">PR Number</th>
+                        <th style="width: 20%;">PR Title</th>
+                        <th style="width: 15%;">PR Author</th>
+                        <th style="width: 15%;">Created Date</th>
+                        <th style="width: 15%;">Merged Date</th>
+                        <th style="width: 15%;">PR State</th>
+                        <th style="width: 15%;">Number of days PR Open</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+"""
+
+    for pr in pull_requests:
+        pr_state = determine_pr_state(pr)
+        days_open = calculate_days_open(pr)
+        html_content += f"""
+                    <tr>
+                        <td>{pr['number']}</td>
+                        <td>{pr['title']}</td>
+                        <td>{pr['user']['login']}</td>
+                        <td>{pr['created_at']}</td>
+                        <td>{pr['merged_at'] if pr['merged_at'] else ''}</td>
+                        <td>{pr_state}</td>
+                        <td>{days_open}</td>
+                    </tr>
+"""
+    html_content += """
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20;
+        var prTable = document.getElementById("prTable");
+        var tableBody = document.getElementById("tableBody");
+
+        function displayRows(start, end) {
+            for (var i = start; i < end; i++) {
+                var row = prTable.insertRow(-1);
+                row.innerHTML = tableBody.rows[i].innerHTML;
+            }
+        }
+
+        function displayTable() {
+            var start = (currentPage - 1) * rowsPerPage;
+            var end = start + rowsPerPage;
+            end = end > tableBody.rows.length ? tableBody.rows.length : end;
+            displayRows(start, end);
+        }
+
+        displayTable();
+    </script>
+</body>
+
+</html>
+"""
+
+    with open(HTML_FILENAME, 'w') as file:
+        file.write(html_content)
+
+if __name__ == "__main__":
+    main()

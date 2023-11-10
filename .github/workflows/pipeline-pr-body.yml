@@ -11,31 +11,200 @@ on:
       - develop
     paths-ignore:
       - "**/README.md"
-#Jobs Test
+#Jobs
 jobs:
   pr_body:
     runs-on: ubuntu-latest
+    environment: DEV-CI
     # Only executes next steps if Source branch name starts with feature or defect
     if: ((github.event_name == 'pull_request'))
+    env:
+      GH_TOKEN: ${{ secrets.V_METADATA_SEC }}
     steps:
       # Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        name: Setup Python
-        with:
-          python-version: '3.7'
+      - name: GH CLI
+        run: |
+          echo "GH CLI Version:"
+          gh --version
 
-      - name: Setup Python
+      - name: Git fetch
+        run:  |
+          git fetch origin ${{github.head_ref}}
+          git checkout ${{github.head_ref}}
+
+      # Create a PR comment thread
+      - name: Create PR comment Thread
         run: |
-          pip install --upgrade argparse
-      # Find unit tests defined in the PR Body version 2
-      - name: Find Unit Tests In Pull Request Body v2
-        id: regex-match
+          echo -e '## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} -F comment.txt
+
+      # Update comment in PR Thread: OS dependencies installed
+      # - name: Issue comment
+      #   run: |
+      #     LAST_ISSUE_COMMENT_BODY=$(gh pr view -c --json body)
+      #     echo "$LAST_ISSUE_COMMENT_BODY"
+      #     echo "${{ github.event.comment.body }}"
+
+      #     # echo '${{github.event.issue_comments.comment.body}}' > simple2.txt
+      #     # cat simple2.txt
+      #     # gh pr view --comments --json body | jq -r '.[0].body' > simple.txt
+      #     # cat simple.txt
+
+      # Update comment in PR Thread: OS dependencies installed
+      - name: Update Comment Thread - Dependencies installed
         run: |
-          echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
-          python3 ./readPRBody.py -s pullRequestBody.txt
-      # Print ENV PR_TESTS
-      - name: Echo PR_TESTS
-        run: echo ${{env.PR_TESTS}}
+          echo "+ All dependencies installed" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt 
+
+      # Update comment in PR Thread: Salesforce-Auth-Success
+      - name: Update Comment Thread - Salesforce authentication Successful
+        run: |
+          echo "+ Successful Salesforce authentication :white_check_mark:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        # if: (steps.MergerDX.outcome != 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Delta Package not built. :x:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment PR Thread for Build-Success
+      - name: Update Comment Thread - Delta Package Built Successfully
+        # if: (github.event_name == 'pull_request' && steps.MergerDX.outcome == 'success')
+        run: |
+          echo -e "+ Delta Package Built Successfully srcToDeploy.zip :white_check_mark:\n Navigate to workflow run URL: [1] :white_check_mark:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Nomenclature-Success
+      - name: Update Comment Thread - Nomenclature validation build succesfully
+        # if: (steps.nomenclatureValidation.outcome == 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Nomenclature validation build succesfully :white_check_mark:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Nomenclature-Fails
+      - name: Update Comment Thread - Nomenclature validation failed
+        # if: (steps.MergerDX.outcome == 'success' && steps.nomenclatureValidation.outcome != 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Nomenclature validation failed. :x:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: If unit tests are defined otherwise skip this step
+      - name: Update Comment Thread - Unit Tests to be run
+        # if: (env.PR_TESTS != '' && github.event_name == 'pull_request')
+        run: |
+          echo " + Unit Tests to be run: ${{ env.PR_TESTS }}" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Validation-success
+      - name: Update Comment Thread - SFDX Validate Success
+        # if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode == 0 && github.event_name == 'pull_request')
+        run: |
+          echo "+ Validate Success :white_check_mark:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+ 
+      # Update a comment in PR Thread: Validation-failed
+      - name: Update comment - SFDX Validate Failed
+        # if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode != 0 && github.event_name == 'pull_request')
+        run: |
+          echo "+ Validate Failed :x:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Deployment-success
+      - name: Update Comment Thread - SFDX Deploy comment Success
+        # if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'pull_request'))
+        run: |
+          echo "+ Deployment Success :white_check_mark:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Update Comment Thread - SFDX Deploy Failure
+        # if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'pull_request'))
+        run: |
+          echo "+ Deployment Failed :x:" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Apporve PR
+        id: ApporvePR
+        continue-on-error: true
+        run: |
+          echo "Login: @${{ github.event.pull_request.user.login }}"
+          username=${{ github.event.pull_request.user.login}}
+          if [[ "$username" == "Kiran-Waghamare" ]]; then
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
+            ----
+            @${{ github.event.pull_request.user.login }} Cant approve your own pull request"
+          else
+            gh pr review ${{ github.event.pull_request.number }} --approve --body "GitHub-Actions[Bot] Approved the changes
+            ----
+            @${{ github.event.pull_request.user.login }} Changes Approved"
+          fi
+
+      # - name: Apporve PR - Fail
+      #   if: (steps.ApporvePR.outcome == 'failure')
+      #   run: |
+      #     echo "Login: @${{ github.event.pull_request.user.login }}"
+      #     echo "Name: @${{ github.event.pull_request.user.name }}"
+      #     echo -e "+ Can not approve your own pull request 
+      #     ----
+      #     @${{ github.event.pull_request.user.login }} Deployment is complete, please review." >> comment.txt
+      #     gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comment.txt
+
+      - name: Load env vars using Python
+        run: |
+          python3 ./AddEnv.py
+          echo "Success"
+      # Load specific Variables to this Enviroment
+      #- name: SFDX Load Dynamic Vars
+      #  id: sfdxDynoVar
+      #  continue-on-error: true
+      #  shell: bash
+      #  run: |
+      #    source .env.devci
+
+      - name: print env variables
+        shell: bash
+        run: |
+          git fetch --all
+          git diff --name-only origin/${{github.head_ref}} origin/${{github.base_ref}}
+
+      - name: print env variables
+        shell: bash
+        run: |
+          echo "Variable 1: ${{env.SF_User}}"
+          echo "Variable 2: ${{env.SF_User2}}"
+          cat .env.devci
+
+      - name: Test cmd
+        run: |
+          echo "Hello"
+          # sudo -s
+          # sed -i '/^declare -x OLDPWD/d' ./.env.devci
+          # set -a
+          # eval $(dotenv -f ./.env.devci)
+          # export >> $GITHUB_ENV
+          # set +a
+          # echo "source ORGS/.env.DEV-CI" >> "$GITHUB_ENV"
+
+      # - name: Load .env file
+      #   uses: xom9ikk/dotenv@v2
+      #   with:
+      #     path: ./ORGS/
+      #     mode: DEV-CI
+
+      # # Find unit tests defined in the PR Body version 2
+      # - name: Find Unit Tests In Pull Request Body v2
+      #   id: regex-match
+      #   run: |
+      #     echo '${{github.event.pull_request.body}}' > pullRequestBody.txt
+      #     python3 ./readPRBody.py -s pullRequestBody.txt
+      # # Print ENV PR_TESTS
+      # - name: Echo PR_TESTS
+      #   run: echo ${{env.PR_TESTS}}
