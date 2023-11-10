@@ -1,0 +1,882 @@
+{
+  "status": 1,
+  "result": {
+    "checkOnly": true,
+    "completedDate": "2023-10-30T16:24:42.000Z",
+    "createdBy": "0052600000",
+    "createdByName": "user",
+    "createdDate": "2023-10-30T16:20:10.000Z",
+    "details": {
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "CustomMetadata",
+          "created": true,
+          "createdDate": "2023-10-30T16:20:13.000Z",
+          "deleted": false,
+          "fileName": "customMetadata/ALT_GeneralSettings.ALT_TXT_DefaultMatrixName.md",
+          "fullName": "ALT_GeneralSettings.ALT_TXT_DefaultMatrixName",
+          "id": "m0J260000009YaoEAE",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "CustomField",
+          "created": true,
+          "createdDate": "2023-10-30T16:20:13.000Z",
+          "deleted": false,
+          "fileName": "objects/OrderItem.object",
+          "fullName": "OrderItem.ALT_OLI_LKP_DecisionMatrixVersion__c",
+          "id": "00N2600000Hs2lrEAB",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2023-10-30T16:20:49.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "codeCoverage": [
+          {
+            "id": "01p26000007wmw0AAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 50,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 52,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 53,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 78,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 88,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler",
+            "namespace": null,
+            "numLocations": 55,
+            "numLocationsNotCovered": 5,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmvpAAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 51,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_DOMAIN_CommercialAttributes",
+            "namespace": null,
+            "numLocations": 50,
+            "numLocationsNotCovered": 1,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000008A2WJAA0",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 19,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 48,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 52,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 76,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "CustomGetOffersRHandler",
+            "namespace": null,
+            "numLocations": 43,
+            "numLocationsNotCovered": 4,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007vAWCAA2",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 53,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 57,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "PricingPlanHelper",
+            "namespace": null,
+            "numLocations": 1826,
+            "numLocationsNotCovered": 1611,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmvvAAA",
+            "name": "ALT_DOMAIN_Products",
+            "namespace": null,
+            "numLocations": 56,
+            "numLocationsNotCovered": 0,
+            "type": "Class",
+            "dmlInfo": [],
+            "locationsNotCovered": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          },
+          {
+            "id": "01p26000007wmw1AAA",
+            "locationsNotCovered": [
+              {
+                "column": 0,
+                "line": 46,
+                "numExecutions": 0,
+                "time": -1
+              },
+              {
+                "column": 0,
+                "line": 48,
+                "numExecutions": 0,
+                "time": -1
+              }
+            ],
+            "name": "ALT_IMPLEMENTATION_PricingMatrixService",
+            "namespace": null,
+            "numLocations": 33,
+            "numLocationsNotCovered": 2,
+            "type": "Class",
+            "dmlInfo": [],
+            "methodInfo": [],
+            "soqlInfo": [],
+            "soslInfo": []
+          }
+        ],
+        "codeCoverageWarnings": [
+          {
+            "id": "01p26000007vAWC",
+            "message": "Test coverage of selected Apex Class is 11,774%, at least 75% test coverage is required",
+            "name": "PricingPlanHelper",
+            "namespace": null
+          }
+        ],
+        "flowCoverage": [
+          {
+            "elementsNotCovered": [
+              "filltreatmentarea"
+            ],
+            "flowId": "30126000000onU8",
+            "flowName": "ALT_FLW_AEDTreatmentArea",
+            "flowNamespace": null,
+            "numElements": 1,
+            "numElementsNotCovered": 1,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "assignqueuetreatmentarea",
+              "closedtypeassign",
+              "isclosedstatus",
+              "is_entry_door_empty",
+              "populateprevioustreatmentarea",
+              "populatefirstendorsementtreatmentarea",
+              "update",
+              "update_case_entitlement",
+              "removeflowbutton",
+              "assign_case_entry_door",
+              "assign_case_typification",
+              "checkprevioustreatmentareafield",
+              "checkpopulatefirsttreatmentarea",
+              "update1",
+              "pause_milestone",
+              "gettreatmentareaobjectvalues",
+              "checkstatuschanged",
+              "getagententrydoorvalues",
+              "populatestatuschangeddatefield",
+              "assignusertreatmentarea",
+              "caseowneruserorqueue",
+              "get_entitlement"
+            ],
+            "flowId": "30126000000q3J5",
+            "flowName": "ALT_FLW_CaseTriggerFlow_Create",
+            "flowNamespace": null,
+            "numElements": 22,
+            "numElementsNotCovered": 22,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "checkservicegroup",
+              "updatecasetypification",
+              "assigndefaultsubchannel",
+              "checksubchannel",
+              "checkchannelfield",
+              "assingdefaultservicegroup",
+              "assingdefaultchannel"
+            ],
+            "flowId": "30126000000oiah",
+            "flowName": "ALT_FLW_CaseTypification_TriggerFlow",
+            "flowNamespace": null,
+            "numElements": 7,
+            "numElementsNotCovered": 7,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "updatenormalizedfullname"
+            ],
+            "flowId": "30126000000q3eO",
+            "flowName": "ALT_FLW_ContactUpdateNormalizedFullName",
+            "flowNamespace": null,
+            "numElements": 1,
+            "numElementsNotCovered": 1,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "createdunningorders"
+            ],
+            "flowId": "30126000000qE6M",
+            "flowName": "ALT_FLW_CreateDunningOrders",
+            "flowNamespace": null,
+            "numElements": 1,
+            "numElementsNotCovered": 1,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "verifyinitialdate",
+              "populateeventmarkingparentenddate"
+            ],
+            "flowId": "30126000000pgTr",
+            "flowName": "ALT_FLW_CustomerEventMarkingsTriggerFlow",
+            "flowNamespace": null,
+            "numElements": 2,
+            "numElementsNotCovered": 2,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "update_customer_interaction",
+              "update_chain_of_ci_transfers",
+              "increment_duration",
+              "update_recordtype",
+              "is_end_date_changed",
+              "compare_duration_2",
+              "get_outbound_recordtype",
+              "is_account_empty_and_asset_selected",
+              "update_name",
+              "add_record_to_update",
+              "get_customer_interactions",
+              "compare_duration",
+              "assign_duration",
+              "is_ci_outbound_or_inbound",
+              "ci_loop"
+            ],
+            "flowId": "30126000000pHHG",
+            "flowName": "ALT_FLW_CustomerInteractionTriggerFlow",
+            "flowNamespace": null,
+            "numElements": 15,
+            "numElementsNotCovered": 15,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "statusafterbo",
+              "approval_status_to_case_status",
+              "is_there_ci",
+              "need_status_update",
+              "get_related_case",
+              "assign_case_field",
+              "copy_1_of_status_in_treatment",
+              "get_related_ci",
+              "assign_status_ci2",
+              "assign_status_ci",
+              "update_case",
+              "update_case_2",
+              "is_email_sent",
+              "update_status",
+              "is_email_rejected",
+              "update_ci1",
+              "update_ci2",
+              "remove_safety_checkbox"
+            ],
+            "flowId": "30126000000p2DJ",
+            "flowName": "ALT_FLW_EmailMessageTriggerFlow",
+            "flowNamespace": null,
+            "numElements": 18,
+            "numElementsNotCovered": 18,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "assigneeinitialdate",
+              "waschangedenddate",
+              "waschangedinitialdateorenddate",
+              "assigneeenddate",
+              "waschangedinitialdate",
+              "updateenddatecustomereventrecords",
+              "getallcustomereventmarkings",
+              "updateinitialdatecustomereventrecords"
+            ],
+            "flowId": "30126000000pgTs",
+            "flowName": "ALT_FLW_EventMarkingsTriggerFlow",
+            "flowNamespace": null,
+            "numElements": 8,
+            "numElementsNotCovered": 8,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "get_technical_record_type_name",
+              "copy_1_of_check_existing_cases",
+              "is_technical_case",
+              "check_existing_cases",
+              "get_existing_case_record_technical",
+              "assign_insistence_fields",
+              "copy_1_of_assign_insistence_fields",
+              "checkcaseorigin",
+              "get_existing_case_record_non_technical"
+            ],
+            "flowId": "30126000000qOqz",
+            "flowName": "ALT_FLW_InsistenceCaseAutoFlow",
+            "flowNamespace": null,
+            "numElements": 9,
+            "numElementsNotCovered": 9,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "status_active",
+              "assign_brm_type",
+              "assign_brm_type3",
+              "assign_brm_type2",
+              "update_payment_method",
+              "get_bank_response_matrix",
+              "what",
+              "update_accounts",
+              "get_sepa_response_code",
+              "update_payment_method1",
+              "status_active11",
+              "is_sepa_error_code_updated",
+              "payment_method_error"
+            ],
+            "flowId": "30126000000pbqC",
+            "flowName": "ALT_FLW_PaymentMethodTriggerFlow",
+            "flowNamespace": null,
+            "numElements": 13,
+            "numElementsNotCovered": 13,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "get_existing_case_record",
+              "assign_total_no_of_relapses",
+              "check_existing_cases",
+              "check_if_priority_90",
+              "assign_relapse_fields",
+              "increase_priority_value"
+            ],
+            "flowId": "30126000000q2sT",
+            "flowName": "ALT_FLW_RelapseCaseAutoFlow",
+            "flowNamespace": null,
+            "numElements": 6,
+            "numElementsNotCovered": 6,
+            "processType": "AutoLaunchedFlow"
+          },
+          {
+            "elementsNotCovered": [
+              "createconsumeraccount",
+              "createserviceaccountnumber",
+              "getserviceaccountnumberrecord",
+              "getconsumeraccountnumberrecord"
+            ],
+            "flowId": "30126000000oVGK",
+            "flowName": "AccountAutonumerics",
+            "flowNamespace": null,
+            "numElements": 8,
+            "numElementsNotCovered": 4,
+            "processType": "AutoLaunchedFlow"
+          }
+        ],
+        "numFailures": 0,
+        "numTestsRun": 32,
+        "successes": [
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "constructorCanCreateCommercialAttributeFromListObject",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 263
+          },
+          {
+            "id": "01p26000008of9dAAA",
+            "methodName": "invokeMethod",
+            "name": "ALT_CustomGetOffersRHandler_Test",
+            "namespace": null,
+            "time": 1254
+          },
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "getPricingMatrixAttribute",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 464
+          },
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "getCommercialAttributesComingFromMatrix",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 343
+          },
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "getPricingMatrixAttributeReturnNullIfAttributeIsNotFound",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 2138
+          },
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "toResponse",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 336
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "attributePricingMatrixNames",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 310
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "autoApplyPromotionsAtBrowseOffer",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 238
+          },
+          {
+            "id": "01p26000008of9hAAA",
+            "methodName": "updateFromMatrixRow",
+            "name": "ALT_DOMAIN_CommercialAttributes_Test",
+            "namespace": null,
+            "time": 384
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "groupByOrderOfGroup",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 245
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "constructorCanCreateProductsFromListOffers",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 310
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "constructorCanCreateProductsFromListObject",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 241
+          },
+          {
+            "id": "01p26000008of9sAAA",
+            "methodName": "multiplyProductsByAttributePricingMatrixRows",
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+            "namespace": null,
+            "time": 252
+          },
+          {
+            "id": "01p26000008of9sAAA",
+            "methodName": "constructOffersFromResponseShouldBeEmptyIfResponseIsNull",
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+            "namespace": null,
+            "time": 233
+          },
+          {
+            "id": "01p26000008of9sAAA",
+            "methodName": "constructOffersFromResponse",
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+            "namespace": null,
+            "time": 325
+          },
+          {
+            "id": "01p26000008of9nAAA",
+            "methodName": "toResponse",
+            "name": "ALT_DOMAIN_Products_Test",
+            "namespace": null,
+            "time": 269
+          },
+          {
+            "id": "01p26000008of9sAAA",
+            "methodName": "putPromotionsInsideProducts",
+            "name": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+            "namespace": null,
+            "time": 433
+          },
+          {
+            "id": "01p26000008of9tAAA",
+            "methodName": "getAttributePricingMatrixRowsFilteredByChannelAndOrderable",
+            "name": "ALT_PricingMatrixService_Test",
+            "namespace": null,
+            "time": 189
+          },
+          {
+            "id": "01p26000008of9tAAA",
+            "methodName": "getLatestCalculationMatrixVersion",
+            "name": "ALT_PricingMatrixService_Test",
+            "namespace": null,
+            "time": 343
+          },
+          {
+            "id": "01p26000008of9tAAA",
+            "methodName": "getCalculationMatrixRows",
+            "name": "ALT_PricingMatrixService_Test",
+            "namespace": null,
+            "time": 341
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "attributeBasedUsagePricing",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 11956
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "attributeRangeBasedTargetPricing",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 6249
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "attributeValueBasedTargetPricing",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5930
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "attributeValueBasedTargetPricing_UOW",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5237
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "attributeValuesBasedTargetPricing",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 6422
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "rangeABPWithDifferentQuantityRanges",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 13876
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "testABPUsingBPOs",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5876
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "testCachedApiResponseLoad",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5560
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "testOutputAttributeMap",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 6233
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "testRangeAttributeOverlapping",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 7103
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "testTimePlanPolicyVolumeABP",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5702
+          },
+          {
+            "id": "01p26000007vAWBAA2",
+            "methodName": "v2AttributeValueBasedTargetPricing",
+            "name": "CustomPricingPlanStepImplTest",
+            "namespace": null,
+            "time": 5822
+          }
+        ],
+        "totalTime": 97739,
+        "failures": [],
+        "flowCoverageWarnings": []
+      },
+      "componentFailures": []
+    },
+    "done": true,
+    "id": "0Af26000025kB2CCAU",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2023-10-30T16:24:42.000Z",
+    "numberComponentErrors": 0,
+    "numberComponentsDeployed": 18,
+    "numberComponentsTotal": 18,
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 32,
+    "numberTestsTotal": 32,
+    "rollbackOnError": true,
+    "runTestsEnabled": true,
+    "startDate": "2023-10-30T16:20:10.000Z",
+    "status": "Failed",
+    "success": false,
+    "files": [
+      {
+        "fullName": "ALT_CustomGetOffersRHandler_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_CustomGetOffersRHandler_Test.cls"
+      },
+      {
+        "fullName": "ALT_CustomGetOffersRHandler_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_CustomGetOffersRHandler_Test.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_DOMAIN_CommercialAttributes",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_CommercialAttributes.cls"
+      },
+      {
+        "fullName": "ALT_DOMAIN_CommercialAttributes",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_CommercialAttributes.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_DOMAIN_CommercialAttributes_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_CommercialAttributes_Test.cls"
+      },
+      {
+        "fullName": "ALT_DOMAIN_CommercialAttributes_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_CommercialAttributes_Test.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_DOMAIN_Products",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_Products.cls"
+      },
+      {
+        "fullName": "ALT_DOMAIN_Products",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_Products.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_DOMAIN_Products_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_Products_Test.cls"
+      },
+      {
+        "fullName": "ALT_DOMAIN_Products_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_DOMAIN_Products_Test.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_GetOffersHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_GetOffersHandler.cls"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_GetOffersHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_GetOffersHandler.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_GetOffersHandler_Test.cls"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_GetOffersHandler_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_GetOffersHandler_Test.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_PricingMatrixService",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_PricingMatrixService.cls"
+      },
+      {
+        "fullName": "ALT_IMPLEMENTATION_PricingMatrixService",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_IMPLEMENTATION_PricingMatrixService.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_INTERFACE_GetOffersHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_INTERFACE_GetOffersHandler.cls"
+      },
+      {
+        "fullName": "ALT_INTERFACE_GetOffersHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_INTERFACE_GetOffersHandler.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_INTERFACE_PricingMatrixService",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_INTERFACE_PricingMatrixService.cls"
+      },
+      {
+        "fullName": "ALT_INTERFACE_PricingMatrixService",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_INTERFACE_PricingMatrixService.cls-meta.xml"
+      },
+      {
+        "fullName": "ALT_PricingMatrixService_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_PricingMatrixService_Test.cls"
+      },
+      {
+        "fullName": "ALT_PricingMatrixService_Test",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/ALT_PricingMatrixService_Test.cls-meta.xml"
+      },
+      {
+        "fullName": "CustomGetOffersRHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/CustomGetOffersRHandler.cls"
+      },
+      {
+        "fullName": "CustomGetOffersRHandler",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/CustomGetOffersRHandler.cls-meta.xml"
+      },
+      {
+        "fullName": "CustomPricingPlanStepImplTest",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/CustomPricingPlanStepImplTest.cls"
+      },
+      {
+        "fullName": "CustomPricingPlanStepImplTest",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/CustomPricingPlanStepImplTest.cls-meta.xml"
+      },
+      {
+        "fullName": "PricingPlanHelper",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/PricingPlanHelper.cls"
+      },
+      {
+        "fullName": "PricingPlanHelper",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "./srcToDeploy/classes/PricingPlanHelper.cls-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}
