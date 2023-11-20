@@ -114,3 +114,51 @@ if __name__ == "__main__":
 
     folder_path_argument = args.src_path
     get_test_files(folder_path_argument)
+
+v4
+import os
+import argparse
+import re
+
+def get_test_files(src_path, output_path):
+    try:
+        # Validate if the given source path exists
+        if not os.path.exists(src_path):
+            raise FileNotFoundError("Source folder not found. Please provide a valid path.")
+
+        # Find the "classes" folder inside the source path
+        classes_path = os.path.join(src_path, "classes")
+        if not os.path.exists(classes_path) or not os.path.isdir(classes_path):
+            raise FileNotFoundError("Classes folder not found. Make sure it exists.")
+
+        # Define a regular expression for matching file names
+        pattern = re.compile(r'.*(Test|test|_Test|-test)\..*')
+
+        # Get file names that match the criteria using regular expression
+        test_files = [file.split(".")[0] for file in os.listdir(classes_path) if pattern.match(file)]
+
+        # Format the result
+        result = " ".join(test_files)
+
+        # Write the result to the specified output file path
+        output_file_path = os.path.join(output_path, "TestClassesList.txt")
+        with open(output_file_path, "w") as output_file:
+            output_file.write(result)
+
+        print(f"Result written to {output_file_path}")
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    # Set up command-line argument parser
+    parser = argparse.ArgumentParser(description="Find and display test files in the specified folder.")
+    parser.add_argument("--src-path", help="Path to the source folder.", required=True)
+    parser.add_argument("--output-path", help="Path to store the output file.", required=True)
+    args = parser.parse_args()
+
+    folder_path_argument = args.src_path
+    output_path_argument = args.output_path
+    get_test_files(folder_path_argument, output_path_argument)
+
+python script.py --src-path /path/to/source/folder --output-path /path/to/output/folder
