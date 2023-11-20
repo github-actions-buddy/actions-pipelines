@@ -32,3 +32,40 @@ if __name__ == "__main__":
     get_test_files(folder_path_argument)
 
 python script.py --src-path /path/to/your/folder
+v2
+import os
+import argparse
+import re
+
+def get_test_files(folder_path):
+    try:
+        # Validate if the given path exists
+        if not os.path.exists(folder_path):
+            raise FileNotFoundError("Folder not found. Please provide a valid path.")
+
+        # Find the "classes" folder inside the given path
+        classes_path = os.path.join(folder_path, "classes")
+        if not os.path.exists(classes_path) or not os.path.isdir(classes_path):
+            raise FileNotFoundError("Classes folder not found. Make sure it exists.")
+
+        # Define a regular expression for matching file names
+        pattern = re.compile(r'.*(Test|test|_Test|-test)\..*')
+
+        # Get file names that match the criteria using regular expression
+        test_files = [file.split(".")[0] for file in os.listdir(classes_path) if pattern.match(file)]
+
+        # Format and print the result
+        result = " ".join(test_files)
+        print("Test files found:", result)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    # Set up command-line argument parser
+    parser = argparse.ArgumentParser(description="Find and display test files in the specified folder.")
+    parser.add_argument("--src-path", help="Path to the source folder.", required=True)
+    args = parser.parse_args()
+
+    folder_path_argument = args.src_path
+    get_test_files(folder_path_argument)
