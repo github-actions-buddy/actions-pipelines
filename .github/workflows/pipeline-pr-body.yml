@@ -42,7 +42,7 @@ jobs:
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comment.txt
           gh issue comment ${{ github.event.pull_request.number }} -F comment.txt
-      # upload artifact
+      # upload artifact 
       - name: Upload artifact - githubPR.json
         uses: actions/upload-artifact@v3
         with:
