@@ -102,7 +102,7 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          echo "$(gh issue view 32 --json comments | jq -r '.comments[-1].body')" > comments.txt
+          echo "$(gh issue view 34 --json comments | jq -r '.comments[-1].body')" > comments.txt
           echo "Last issue thread is fetched"
           cat comments.txt
 
@@ -114,42 +114,42 @@ jobs:
             ### Artifact Links
 
             + Generated Delta Package [srcToDeploy.zip] :white_check_mark:' >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
 
       # Update a comment PR Thread for describe.log
       - name: Update Comment Thread - describe.txt
         if: (steps.generate_links.outputs.describetxt != "")
         run: |
           echo "+ Generated [describe.txt] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
 
       # Update a comment PR Thread for NomenclatureReport.html
       - name: Update Comment Thread - githubPRjson
         if: (steps.generate_links.outputs.githubPRjson != "")
         run: |
           echo "+ Generated [NomenclatureReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
 
       # Update a comment PR Thread for Validate.json
       - name: Update Comment Thread - Validate.json
         run: |
           echo "+ Generated [Validate.json] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
 
       # Update a comment PR Thread for Deploy.json
       - name: Update Comment Thread - Deploy.json
         run: |
           echo "+ Generated [Deploy.json] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
 
       # Update a comment PR Thread for sfdxScannerReport.html
       - name: Update Comment Thread - sfdxScannerReport.html
         run: |
           echo "+ Generated [sfdxScannerReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
       
       # Update a comment PR Thread for VlocityBuildErrors.log
       - name: Update Comment Thread - VlocityBuildErrors.log
         run: |
           echo "+ Generated [VlocityBuildError.log] :white_check_mark:" >> comments.txt
-          gh issue comment 32 --edit-last -F comments.txt
+          gh issue comment 34 --edit-last -F comments.txt
