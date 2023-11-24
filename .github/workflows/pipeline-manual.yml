@@ -123,10 +123,10 @@ jobs:
           ~/sfdx/bin/sfdx version
 
       # Install SFDX-Scanner
-      - name: Install SFDX-Scanner
-        if: env.SF_METADATA_DEPLOY == 'true'
-        run: |
-          sfdx plugins:install @salesforce/sfdx-scanner
+      # - name: Install SFDX-Scanner
+      #   if: env.SF_METADATA_DEPLOY == 'true'
+      #   run: |
+      #     sfdx plugins:install @salesforce/sfdx-scanner
 
       # Install Git
       - name: Install Git
@@ -168,24 +168,24 @@ jobs:
           echo "PASS"
       
       # Update comment in PR Thread: Salesforce-Auth-Success
-      - name: Update Comment Thread - Salesforce authentication Successful
-        if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='success') && env.PR_NUMBER != '')
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ env.PR_NUMBER }}
-          body: |
-            + Successful Salesforce authentication :white_check_mark:
+      # - name: Update Comment Thread - Salesforce authentication Successful
+      #   if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='success') && env.PR_NUMBER != '')
+      #   uses: peter-evans/create-or-update-comment@v2
+      #   with:
+      #     comment-id: ${{ steps.lastComment.outputs.comment-id }}
+      #     issue-number: ${{ env.PR_NUMBER }}
+      #     body: |
+      #       + Successful Salesforce authentication :white_check_mark:
 
       # Update comment in PR Thread: Salesforce-Auth-Success
-      - name: Update Comment Thread - Salesforce authentication Failed
-        if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='failure') && env.PR_NUMBER != '')
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          comment-id: ${{ steps.lastComment.outputs.comment-id }}
-          issue-number: ${{ env.PR_NUMBER }}
-          body: |
-            + Failure in Salesforce authentication :x:
+      # - name: Update Comment Thread - Salesforce authentication Failed
+      #   if: ((github.event_name == 'workflow_dispatch') && (steps.sfdxAuthenticate.outcome =='failure') && env.PR_NUMBER != '')
+      #   uses: peter-evans/create-or-update-comment@v2
+      #   with:
+      #     comment-id: ${{ steps.lastComment.outputs.comment-id }}
+      #     issue-number: ${{ env.PR_NUMBER }}
+      #     body: |
+      #       + Failure in Salesforce authentication :x:
 
       # Generate Describe Log
       - name: Generate Describe Log
