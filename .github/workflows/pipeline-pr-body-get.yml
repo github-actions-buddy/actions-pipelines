@@ -16,6 +16,11 @@ jobs:
     # Only executes next steps if Source branch name starts with feature or defect
     env:
       GH_TOKEN: ${{ secrets.V_METADATA_SEC }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      actions: read
     steps:
       # Checkout repository
       - name: Checkout Repository
