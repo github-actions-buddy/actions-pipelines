@@ -1,0 +1,68 @@
+name: Cache Warmup solution workflow for PRODUCTION
+
+# Workflow run name
+run-name: Cache Warmup solution workflow run - ${{github.run_number}} for PRODUCTION
+
+# Workflow triggers
+on:
+  workflow_dispatch:
+
+jobs:
+  test_execution_production:
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      # JAVA Version Check
+      - name: JAVA Version Check
+        run: |
+          ls -l
+          java --version
+      
+      # Check Java
+      - name: Java
+        run: |
+          javac cacheW/Main.java
+          echo "Complilation complete"
+          java -cp . cacheW.Main
+          echo "Run complete"
+
+      # Create Jar
+      - name: Create JAR
+        run: |
+          jar cfme Main.jar Manifest.txt cacheW.Main cacheW/Main.class
+
+      # Run Jar
+      - name: Run JAR
+        run: |
+          java -jar Main.jar
+
+      # Install SF CLI V2
+      - name: Install SF CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+          mkdir -p ~/cli/sf
+          ls -la
+          tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
+          echo "$HOME/cli/sf/bin" >> $GITHUB_PATH
+          echo The PATH is $GITHUB_PATH
+          ~/cli/sf/bin/sf version
+
+      # Get current date
+      - name: Get current date
+        id: date
+        run: |
+          echo "buildDate"=$(date +'%d-%B-%Y') >> $GITHUB_OUTPUT
+
+      # Upload artifact
+      - name: Artifact upload - test_results_date.json
+        id: codeCoverageArtifact
+        if: (steps.generateReport.outcome != 'skipped')
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-code-coverage.html
+          path: ./report-code-coverage.html
+          retention-days: 7

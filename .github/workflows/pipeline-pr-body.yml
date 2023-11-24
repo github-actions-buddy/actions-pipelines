@@ -137,7 +137,7 @@ jobs:
         run: |
           echo "Login: @${{ github.event.pull_request.user.login }}"
           username=${{ github.event.pull_request.user.login}}
-          if [[ "$username" == "Kiran-Waghamare" ]]; then
+          if [[ '$username' == 'github-actions-buddy' ]]; then
             gh pr review ${{ github.event.pull_request.number }} --comment --body "GitHub-Actions[Bot] Approved the changes
             ----
             @${{ github.event.pull_request.user.login }} Cant approve your own pull request"
