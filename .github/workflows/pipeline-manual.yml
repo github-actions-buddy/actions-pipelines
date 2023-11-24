@@ -618,34 +618,14 @@ jobs:
 
       # Modify yaml
       - name: Modify YAML for Full Deployment Runtime
-        if: (env.DEPLOYMENT_TYPE == 'Full')
-        run: |
-          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/Interaction.yaml
-          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/InteractionNonCatalogProduct.yaml
-
-      # Vlocity deployment type based on input
-      - name: Vlocity Deployment Type Runtime
-        run: |
-          vlocity_deployment_type="${{env.VLOCITY_DEPLOY_TYPE}}"
-          echo "Vlocity Deployment Type: $vlocity_deployment_type"
-          if [ "$vlocity_deployment_type" == "Incremental" ]; then
-            echo "DEPLOYMENT_TYPE=Incremental" >> $GITHUB_ENV
-          elif [ "$vlocity_deployment_type" == "Full" ]; then
-            echo "Full Deployment"
-            echo "DEPLOYMENT_TYPE=Full" >> $GITHUB_ENV
-          else
-            echo "Invalid deployment type provided."
-            exit 1
-          fi
-      #Modify yaml
-      - name: Modify YAML for Full Deployment Runtime
-        if: (env.DEPLOYMENT_TYPE == 'Full')
+        if: (env.VLOCITY_DEPLOY_TYPE == 'Full')
         run: |
           sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/Interaction.yaml
           sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/InteractionNonCatalogProduct.yaml
 
       # Vlocity deploy
       - name: Vlocity Deployment
+        if: (env.VLOCITY_DEPLOY == 'true')
         run: |
           if [ "${{ env.TARGET_ENVIRONMENT }}" == "DEV-CI" ]; then
             if [ $? -eq 0 ]; then
