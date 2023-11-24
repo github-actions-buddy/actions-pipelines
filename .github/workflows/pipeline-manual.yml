@@ -38,6 +38,14 @@ on:
         required: true
         default: false
         type: boolean
+      vlocityDeploymentIncFull:
+        description: "Type of Vlocity Deployment"
+        default: "Incremental"
+        type: choice
+        required: true
+        options:
+          - Incremental
+          - Full
       targetEnv:
         description: 'Target Environment for Deployment'
         default: 'None'
@@ -632,13 +640,95 @@ jobs:
           npm install --global vlocity
           vlocity --version
 
-      # Deploy the difference in vlocity folder to instance
-      - name: Deploy Vlocity
-        id: vlocityDeploy
-        if: ((env.VLOCITY_DEPLOY == 'true') && (steps.VlocityDiff.outcome == 'failure') && (github.event_name == 'workflow_dispatch'))
-        continue-on-error: true
+      # Vlocity deployment type based on input
+      - name: Vlocity Deployment Type Runtime
         run: |
-          echo "PASS"
+          vlocity_deployment_type="${{env.VLOCITY_DEPLOY_TYPE}}"
+          echo "Vlocity Deployment Type: $vlocity_deployment_type"
+          if [ "$vlocity_deployment_type" == "Incremental" ]; then
+            echo "DEPLOYMENT_TYPE=Incremental" >> $GITHUB_ENV
+          elif [ "$vlocity_deployment_type" == "Full" ]; then
+            echo "Full Deployment"
+            echo "DEPLOYMENT_TYPE=Full" >> $GITHUB_ENV
+          else
+            echo "Invalid deployment type provided."
+            exit 1
+          fi
+
+      # Modify yaml
+      - name: Modify YAML for Full Deployment Runtime
+        if: (env.DEPLOYMENT_TYPE == 'Full')
+        run: |
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/Interaction.yaml
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/InteractionNonCatalogProduct.yaml
+
+      # Vlocity deploy
+      - name: Vlocity Deployment
+        run:  |
+          if [ "${{ env.TARGET_ENVIRONMENT }}" == "DEV-CI" ]; then
+            if [ $? -eq 0 ]; then
+              echo 'Vlocity hash update was successful'
+
+              if grep -Eq "EXIT CODE 0" ./vlocityDiff.txt; then
+                echo "::warning::No Changes Detected"
+                exit 1
+              elif grep -Eq "vlocity/(Product2|Catalog|AttributeCategory|EntityFilter|ObjectClass|ObjectLayout|Pricebook2|PriceList|PricingPlan|PricingVariable|Promotion|Rule|TimePlan|TimePolicy|VlocityPicklist)/.*" ./vlocityDiff.txt; then
+                cat vlocity/jobs/Interaction.yaml
+                if [ $? -eq 0 ]; then
+                  echo 'Vlocity Deploy was successful'
+                else
+                        # Vlocity deployment type based on input
+      - name: Vlocity Deployment Type Runtime
+        run: |
+          vlocity_deployment_type="${{env.VLOCITY_DEPLOY_TYPE}}"
+          echo "Vlocity Deployment Type: $vlocity_deployment_type"
+          if [ "$vlocity_deployment_type" == "Incremental" ]; then
+            echo "DEPLOYMENT_TYPE=Incremental" >> $GITHUB_ENV
+          elif [ "$vlocity_deployment_type" == "Full" ]; then
+            echo "Full Deployment"
+            echo "DEPLOYMENT_TYPE=Full" >> $GITHUB_ENV
+          else
+            echo "Invalid deployment type provided."
+            exit 1
+          fi
+      #Modify yaml
+      - name: Modify YAML for Full Deployment Runtime
+        if: (env.DEPLOYMENT_TYPE == 'Full')
+        run: |
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/Interaction.yaml
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/InteractionNonCatalogProduct.yaml
+
+      # Vlocity deploy
+      - name: Vlocity Deployment
+        run: |
+          if [ "${{ env.TARGET_ENVIRONMENT }}" == "DEV-CI" ]; then
+            if [ $? -eq 0 ]; then
+              echo 'Vlocity hash update was successful'
+
+              if grep -Eq "EXIT CODE 0" ./vlocityDiff.txt; then
+                echo "::warning::No Changes Detected"
+                exit 1
+              elif grep -Eq "vlocity/(Product2|Catalog|AttributeCategory|EntityFilter|ObjectClass|ObjectLayout|Pricebook2|PriceList|PricingPlan|PricingVariable|Promotion|Rule|TimePlan|TimePolicy|VlocityPicklist)/.*" ./vlocityDiff.txt; then
+                cat vlocity/jobs/Interaction.yaml
+                if [ $? -eq 0 ]; then
+                  echo 'Vlocity Deploy was successful'
+                else
+                  echo 'Else Condition'
+                fi
+              elif ! grep -Eq "vlocity/(Product2|Catalog|AttributeCategory|EntityFilter|ObjectClass|ObjectLayout|Pricebook2|PriceList|PricingPlan|PricingVariable|Promotion|Rule|TimePlan|TimePolicy|VlocityPicklist)/.*" ./vlocityDiff.txt; then
+                # Maintenance jobs if deployment package not contains Catalog or Product2
+                cat vlocity/jobs/InteractionNonCatalogProduct.yaml
+                if [ $? -eq 0 ]; then
+                  echo 'Vlocity Deploy was successful'
+                else
+                  echo 'Else condition'
+                fi
+              else
+                echo "::error::Something went wrong in vlocity deploy"
+              fi
+            else
+              echo "::error::Error in bash script"
+            fi
 
       # Upload the output to ./VlocityBuildErrors.log
       - uses: actions/upload-artifact@v3
