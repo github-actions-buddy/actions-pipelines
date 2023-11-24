@@ -68,7 +68,7 @@ jobs:
           fi
 
           if [ -e "describe.txt" ]; then
-            artifactLink=""
+            artifactLink="google.com"
             echo "$artifactLink"
             echo "describetxt=$artifactLink" >> $GITHUB_OUTPUT
           else
@@ -79,7 +79,7 @@ jobs:
           fi
 
           if [ -e "githubPR.json" ]; then
-            artifactLink=""
+            artifactLink="google.com"
             echo "$artifactLink"
             echo "githubPRjson=$artifactLink" >> $GITHUB_OUTPUT
           else
