@@ -62,7 +62,7 @@ jobs:
         with:
           name: HTML_2.html
           path: ./HTML_2.html
-          retention-days: 1
+          retention-days: 2
 
       # Update comment in PR Thread: OS dependencies installed
       # - name: Issue comment
