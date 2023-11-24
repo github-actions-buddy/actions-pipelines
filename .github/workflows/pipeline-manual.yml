@@ -603,6 +603,7 @@ jobs:
 
       # Vlocity deployment type based on input
       - name: Vlocity Deployment Type Runtime
+        if: (env.VLOCITY_DEPLOY == 'true')
         run: |
           vlocity_deployment_type="${{env.VLOCITY_DEPLOY_TYPE}}"
           echo "Vlocity Deployment Type: $vlocity_deployment_type"
@@ -618,7 +619,7 @@ jobs:
 
       # Modify yaml
       - name: Modify YAML for Full Deployment Runtime
-        if: (env.VLOCITY_DEPLOY_TYPE == 'Full')
+        if: (env.VLOCITY_DEPLOY_TYPE == 'Full' && env.VLOCITY_DEPLOY == 'true')
         run: |
           sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/Interaction.yaml
           sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/InteractionNonCatalogProduct.yaml
