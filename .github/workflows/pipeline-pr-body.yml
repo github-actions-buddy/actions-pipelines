@@ -46,22 +46,22 @@ jobs:
       - name: Upload artifact - githubPR.json
         uses: actions/upload-artifact@v3
         with:
-          name: githubPR_2.json
-          path: ./githubPR_2.json
+          name: githubPR.json
+          path: ./githubPR.json
           retention-days: 1
       
       - name: Upload artifact - describe.txt
         uses: actions/upload-artifact@v3
         with:
-          name: describe_2.txt
-          path: ./describe_2.txt
+          name: describe.txt
+          path: ./describe.txt
           retention-days: 1
 
       - name: Upload artifact - HTML.html
         uses: actions/upload-artifact@v3
         with:
-          name: HTML_2.html
-          path: ./HTML_2.html
+          name: HTML.html
+          path: ./HTML.html
           retention-days: 1
 
       # Update comment in PR Thread: OS dependencies installed
