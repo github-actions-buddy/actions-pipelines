@@ -675,6 +675,9 @@ jobs:
             else
               echo "::error::Error in bash script"
             fi
+          else
+            echo "Something failed"
+          fi
 
       # Upload the output to ./VlocityBuildErrors.log
       - uses: actions/upload-artifact@v3
