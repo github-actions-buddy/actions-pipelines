@@ -1,0 +1,85 @@
+name: Manual Deployment Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-type:
+        description: 'Select deployment type'
+        required: true
+        default: 'incremental'
+        options:
+          - 'incremental'
+          - 'full'
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Determine Deployment Type
+        id: determine_deployment
+        run: |
+          deployment_type="${{ github.event.inputs.deployment-type }}"
+          echo "Deployment Type: $deployment_type"
+          if [ "$deployment_type" == "incremental" ]; then
+            echo "Incremental Deployment"
+          elif [ "$deployment_type" == "full" ]; then
+            echo "Full Deployment"
+          else
+            echo "Invalid deployment type provided."
+            exit 1
+          fi
+
+      - name: Modify YAML for Full Deployment
+        if: steps.determine_deployment.outputs.deployment_type == 'full'
+        run: |
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/int.yaml
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/int_2.yaml
+
+v2
+
+name: Manual Deployment Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-type:
+        description: 'Select deployment type'
+        required: true
+        default: 'incremental'
+        options:
+          - 'incremental'
+          - 'full'
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Determine Deployment Type
+        id: determine_deployment
+        run: |
+          deployment_type="${{ github.event.inputs.deployment-type }}"
+          echo "Deployment Type: $deployment_type"
+          if [ "$deployment_type" == "incremental" ]; then
+            echo "Incremental Deployment"
+            echo "DEPLOYMENT_TYPE=incremental" >> $GITHUB_ENV
+          elif [ "$deployment_type" == "full" ]; then
+            echo "Full Deployment"
+            echo "DEPLOYMENT_TYPE=full" >> $GITHUB_ENV
+          else
+            echo "Invalid deployment type provided."
+            exit 1
+          fi
+
+      - name: Modify YAML for Full Deployment
+        if: env.DEPLOYMENT_TYPE == 'full'
+        run: |
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/int.yaml
+          sed -i -e '/gitCheck:/ s/^/#/' -e '/gitCheckKey:/ s/^/#/' vlocity/jobs/int_2.yaml

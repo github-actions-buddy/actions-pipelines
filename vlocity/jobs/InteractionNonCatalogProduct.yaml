@@ -1,0 +1,36 @@
+# vlocity Build Tool yaml for Catalog or Product2 deployments
+projectPath: vlocity
+
+# Override settings for products and promotions
+OverrideSettings:
+  DataPacks:
+    Product2:
+      MaxDeploy: 1
+      SupportParallel: false
+      SupportParallelDeploy: false
+    Promotion__c:
+      MaxDeploy: 1
+      SupportParallel: false
+      SupportParallelDeploy: false
+
+# Vlocity Build Tool yaml config job
+postJobApex:
+  Deploy:
+    - ./apex/CatalogAndProductJob.cls
+    - ./apex/ProductHierarchyMaintenanceJob.cls
+    - ./apex/ClearManagedPlatformCacheJob.cls
+    - ./apex/RefreshPlatformCacheFullJob.cls
+    - ./apex/PopulateApiCacheJob.cls
+
+preStepApex:
+  Deploy:
+    OmniScript: ./apex/CleanVlocityOmniScripts.cls
+    IntegrationProcedure: ./apex/CleanVlocityIntegrationProcedures.cls
+
+gitCheck: true
+gitCheckKey: vlocity
+puppeteerHeadless: true
+activate: true
+# lwcCompilerVersion: '900.468'
+# useSfdxCli: true
+# npmAuthKey:
