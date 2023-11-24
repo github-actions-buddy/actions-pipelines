@@ -32,7 +32,7 @@ jobs:
           sudo rm -rf srcToDeploy.zip
           sudo rm -rf githubPR.json
           sudo rm -rf describe.txt
-          sudo rum -rf HTML.html
+          sudo rm -rf HTML.html
           ls -la
 
       # Download worflow artifacts from Git2SF workflow
