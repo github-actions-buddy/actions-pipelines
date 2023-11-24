@@ -26,6 +26,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Clean up downloaded directories
+      - name: Clean up step
+        run: |
+          sudo rm -rf srcToDeploy.zip
+          sudo rm -rf githubPR.json
+          sudo rm -rf describe.txt
+          ls -la
+
       # Download worflow artifacts from Git2SF workflow
       - name: Download workflow artifact
         id: download_artifacts
