@@ -48,7 +48,7 @@ jobs:
         with:
           python-version: "3.7"
       
-      # Install requirements.txt from acct-scripts
+      # Install requirements.txt
       - name: Install requirements.txt
         run: |
           ls -l

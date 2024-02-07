@@ -86,7 +86,6 @@ jobs:
         with:
           issue-number: ${{env.PR_NUMBER}}
           body: |
-            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -124,9 +123,9 @@ jobs:
         with:
           python-version: "3.7"
           cache: "pip" # caching pip dependencies
-          cache-dependency-path: ./acct-scripts/requirements.txt
+          cache-dependency-path: ./requirements.txt
 
-      # Install requirements.txt from acct-scripts
+      # Install requirements.txt
       - name: Install requirements.txt
         run: |
           ls -l
@@ -315,7 +314,7 @@ jobs:
         if: (steps.MergerDX.outcome == 'success')
         id: nomenclatureValidation
         run: |
-          python3 ./acct-scripts/nomenclatureCheck/nomenclatureCheck.py ./srcToDeploy
+          # python3 ./acct-scripts/nomenclatureCheck/nomenclatureCheck.py ./srcToDeploy
 
       # Upload Artifact nomenclature-errors.html
       - uses: actions/upload-artifact@v3
@@ -367,8 +366,6 @@ jobs:
         id: regex-match
         run: |
           echo ${{env.UNIT_TESTS}}
-          # echo 'testsToBeRun ALT_ActivationOrderCreation_Test, ALT_BATCH_ResumptionOrder_Test, ALT_BasketOperations_Test, ALT_CLS_AutomaticCaseCloseBatchTest, ALT_CLS_CITriggerHelper_Test, ALT_CLS_CaseAssgmentRulesUsingFlowTest, ALT_CLS_CaseTimeline_Test, ALT_CLS_CommunicationUtilsTest, ALT_CLS_ContactHandlerTest, ALT_CLS_CreateAttachmentFlow_Test, ALT_CLS_CreateContactFlowByPassRuleTest, ALT_CLS_CreateContactUsingFlowTest, ALT_CLS_CustomerInteractionTimeline_Test, ALT_CLS_DnisHandler_Test, ALT_CLS_EmailClosure_Test, ALT_CLS_EntryDoorHandler_Test, ALT_CLS_GDPRVisualizerHandlerTEST, ALT_CLS_GetContactFromTabControllerTest, ALT_CLS_LookupAccount_Test, ALT_CLS_Lookup_Test, ALT_CLS_SendCommunicationFromAFlowTest, ALT_CLS_TransferedCITimeline_Test, ALT_CLS_TreatmentArea_Handler_Test, ALT_CLS_UpdateContactFlowByPassRuleTest, ALT_CLS_UpdateContactUsingFlowTest, ALT_CallCommunicationClassTest, ALT_ChangeOrdStateTriggerHandlerTest, ALT_ChangeOrdStateTriggerHandler_Test, ALT_Controller_Promotion_Test, ALT_CopyBaseChargePricingPlanStep_Test, ALT_CustFuncParentFrlDetails_Test, ALT_CustomDRFunctionsTest, ALT_CustomFunctionClsTest, ALT_CustomFunctionReplace_Test, ALT_CustomGetOffersRHandler_Test, ALT_DCAPIParamsImplementation_Test, ALT_DI_ActivationOrderCreationCtrl_Test, ALT_DOMAIN_AttributePricingMatrixRowTest, ALT_DOMAIN_AttributePricingMatrix_Test, ALT_DOMAIN_CommercialAttribute_Test, ALT_DOMAIN_CommercialAttributes_Test, ALT_DOMAIN_Offer_Test, ALT_DOMAIN_Offers_Test, ALT_DOMAIN_Price_Test, ALT_DOMAIN_Prices_Test, ALT_DOMAIN_Product_Test, ALT_DOMAIN_Products_Test, ALT_DOMAIN_Promotion_Test, ALT_DOMAIN_Promotions_Test, ALT_DOMAIN_RecordType_Test, ALT_DigitalGenerateDocument_Test, ALT_ErrorLogRecordingInsert_Test, ALT_FACTORY_Offer_Test, ALT_FindandReplaceTest, ALT_FindandReplace_Test, ALT_GeneralUtilities_Test, ALT_Globalidupdatesync_Test, ALT_IMPLEMENTATION_GetOffersHandler_Test, ALT_IndustriesDataUtilities_Test, ALT_IntegProcedureSysInterface_Test, ALT_OCSUpdateInventoryItem_Test, ALT_PricingMatrixService_Test, ALT_PricingVariableMapHook_Test, ALT_Rest_ListUserPortfolioTest, ALT_SendSMSClassTest, ALT_TRG_ActOrderCreation_Handler_Test, ALT_TRG_CaseTypificationHelper_Test, ALT_TRG_Handler_Test, ALT_TRG_ModificationOrderCrt_HandlerTest, ALT_UpdateFrlAttributes_Test, ALT_customErrorUtilitiesTest, ALT_customUtilitiesTest, ALT_getPromoDiscDetails_Test, CustomPricingPlanStepImplTest, ValidateNewCustomerCreationTest, gl_WorkspaceConnectorControllerHdl_Test, gl_WorkspaceConnectorController_Test' > pullRequestBody.txt
-          # python3 ./acct-scripts/readPRBody/readPRBody.py -s pullRequestBody.txt
 
       # Print ENV PR_TESTS
       # - name: Echo PR_TESTS
