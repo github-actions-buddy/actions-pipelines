@@ -16,10 +16,78 @@ jobs:
     # Only executes next steps if Source branch name starts with feature or defect
     env:
       GH_TOKEN: ${{ secrets.V_METADATA_SEC }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      actions: read
     steps:
       # Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      # Clean up downloaded directories
+      - name: Clean up step
+        run: |
+          sudo rm -rf srcToDeploy.zip
+          sudo rm -rf githubPR.json
+          sudo rm -rf describe.txt
+          sudo rm -rf HTML.html
+          ls -la
+
+      # Download worflow artifacts from Git2SF workflow
+      - name: Download workflow artifact
+        id: download_artifacts
+        if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: pipeline-pr-body.yml
+          run_id: ${{ github.event.workflow_run.id }}
+          if_no_artifact_found: fail
+
+      # Display structure of downloaded files
+      - name: Display structure of downloaded files
+        run: |
+          ls -la
+      
+      # Generate the Artifact link to srcToDeploy.zip
+      - name: Generate Artifacts Links
+        id: generate_links
+        if: (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure')
+        run: |
+          if [ -e "srcToDeploy.zip" ]; then
+            artifactLink=""
+            echo "$artifactLink"
+            echo "SRC_TO_DEPLOY_LINK=$artifactLink" >> $GITHUB_OUTPUT
+          else
+            artifactLink=""
+            echo "$artifactLink"
+            echo "SRC_TO_DEPLOY_LINK=$artifactLink" >> $GITHUB_OUTPUT
+            echo "::warning:: Failure in getting srcToDeploy.zip Artifact URL"
+          fi
+
+          if [ -e "describe.txt" ]; then
+            artifactLink="google.com"
+            echo "$artifactLink"
+            echo "describetxt=$artifactLink" >> $GITHUB_OUTPUT
+          else
+            artifactLink=""
+            echo "$artifactLink"
+            echo "describetxt=$artifactLink" >> $GITHUB_OUTPUT
+            echo "::warning:: Failure in getting describe Artifact URL"
+          fi
+
+          if [ -e "githubPR.json" ]; then
+            artifactLink="google.com"
+            echo "$artifactLink"
+            echo "githubPRjson=$artifactLink" >> $GITHUB_OUTPUT
+          else
+            artifactLink=""
+            echo "$artifactLink"
+            echo "githubPRjson=$artifactLink" >> $GITHUB_OUTPUT
+            echo "::warning:: Failure in getting githubPRjson Artifact URL"
+          fi
 
       - name: GH CLI
         run: |
@@ -34,51 +102,54 @@ jobs:
       # Find
       - name: Issue last comment
         run: |
-          echo "$(gh issue view 13 --json comments | jq -r '.comments[-1].body')" > comments.txt
+          echo "$(gh issue view 36 --json comments | jq -r '.comments[-1].body')" > comments.txt
           echo "Last issue thread is fetched"
           cat comments.txt
 
       # Update a comment PR Thread for Build-Success
-      - name: Update Comment Thread - Delta Package Built Successfully
+      - name: Update Comment Thread - SRC_TO_DEPLOY_LINK
+        if: ${{steps.generate_links.outputs.SRC_TO_DEPLOY_LINK != ''}}
         run: |
           echo -e '------
             ### Artifact Links
 
             + Generated Delta Package [srcToDeploy.zip] :white_check_mark:' >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for describe.log
-      - name: Update Comment Thread - describe.log
+      - name: Update Comment Thread - describe.txt
+        if: ${{steps.generate_links.outputs.describetxt != ''}}
         run: |
-          echo "+ Generated [describe.log] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          echo "+ Generated [describe.txt] :white_check_mark:" >> comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for NomenclatureReport.html
-      - name: Update Comment Thread - NomenclatureReport
+      - name: Update Comment Thread - githubPRjson
+        if: ${{steps.generate_links.outputs.githubPRjson != ''}}
         run: |
           echo "+ Generated [NomenclatureReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for Validate.json
       - name: Update Comment Thread - Validate.json
         run: |
           echo "+ Generated [Validate.json] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for Deploy.json
       - name: Update Comment Thread - Deploy.json
         run: |
           echo "+ Generated [Deploy.json] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for sfdxScannerReport.html
       - name: Update Comment Thread - sfdxScannerReport.html
         run: |
           echo "+ Generated [sfdxScannerReport.html] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
       
       # Update a comment PR Thread for VlocityBuildErrors.log
       - name: Update Comment Thread - VlocityBuildErrors.log
         run: |
           echo "+ Generated [VlocityBuildError.log] :white_check_mark:" >> comments.txt
-          gh issue comment 13 --edit-last -F comments.txt
+          gh issue comment 36 --edit-last -F comments.txt
