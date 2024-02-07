@@ -44,7 +44,7 @@ jobs:
       # Upload PR number
       - name: Upload Artifact PR number
         if: ${{github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pr_num
           path: ./pr_num.txt
@@ -62,7 +62,7 @@ jobs:
       # Upload the source branch of Pull request
       - name: Upload Artifact source branch of Pull request
         if: ${{github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: branch_name
           path: ./branch_name.txt
@@ -196,7 +196,7 @@ jobs:
           echo "::warning::Step MegerDX Failed: Salesforce Delta Package Not Built"
 
       # Upload the output to ./srcToDeploy.zip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: (steps.MergerDX.outcome == 'success')
         name: Artfifact Upload - ./srcToDeploy.zip
         with:
@@ -219,7 +219,7 @@ jobs:
           echo "Check"
 
       # Upload Artifact nomenclature-errors.html
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Artifact Upload - ./nomenclature-errors.html
         with:
           name: nomenclatureErrorsReport
