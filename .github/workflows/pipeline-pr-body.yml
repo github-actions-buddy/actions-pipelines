@@ -27,7 +27,7 @@ jobs:
 
       # check label
       - name: Label check
-        if: (contains(github.event.pull_request.labels.*.name, 'bug') && contains(github.event.pull_request.labels.*.name, 'defect')) == false
+        if: (contains(github.event.pull_request.labels.*.name, 'bug') && contains(github.event.pull_request.labels.*.name, 'defect'))
         run:  |
           exit 1
 
