@@ -27,9 +27,16 @@ jobs:
 
       # check labels
       - name: Label check
+        id: getLabels
         if: (contains(github.event.pull_request.labels.*.name, 'bug') && contains(github.event.pull_request.labels.*.name, 'defect'))
         run:  |
           exit 0
+      
+      # Validate
+      - name: Validate Label
+        if: (steps.getLabels.outcome == 'failure' || steps.getLabels.outcome == 'skipped')
+        run: |
+          exit 1
 
       - name: GH CLI
         run: |
