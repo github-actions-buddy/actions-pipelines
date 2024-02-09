@@ -25,7 +25,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # check labels
+      # check labels if both labels are there then continue else exit in next step
       - name: Label check
         id: getLabels
         if: (contains(github.event.pull_request.labels.*.name, 'bug') && contains(github.event.pull_request.labels.*.name, 'defect'))
