@@ -61,29 +61,29 @@ jobs:
             echo "$artifactLink"
             echo "SRC_TO_DEPLOY_LINK=$artifactLink" >> $GITHUB_OUTPUT
           else
-            artifactLink=''
+            artifactLink=""
             echo "$artifactLink"
             echo "SRC_TO_DEPLOY_LINK=$artifactLink" >> $GITHUB_OUTPUT
             echo "::warning:: Failure in getting srcToDeploy.zip Artifact URL"
           fi
 
           if [ -e "describe.txt" ]; then
-            artifactLink=""
+            artifactLink="google.com"
             echo "$artifactLink"
             echo "describetxt=$artifactLink" >> $GITHUB_OUTPUT
           else
-            artifactLink=''
+            artifactLink=""
             echo "$artifactLink"
             echo "describetxt=$artifactLink" >> $GITHUB_OUTPUT
             echo "::warning:: Failure in getting describe Artifact URL"
           fi
 
           if [ -e "githubPR.json" ]; then
-            artifactLink=""
+            artifactLink="google.com"
             echo "$artifactLink"
             echo "githubPRjson=$artifactLink" >> $GITHUB_OUTPUT
           else
-            artifactLink=''
+            artifactLink=""
             echo "$artifactLink"
             echo "githubPRjson=$artifactLink" >> $GITHUB_OUTPUT
             echo "::warning:: Failure in getting githubPRjson Artifact URL"
@@ -108,7 +108,7 @@ jobs:
 
       # Update a comment PR Thread for Build-Success
       - name: Update Comment Thread - SRC_TO_DEPLOY_LINK
-        if: (${{steps.generate_links.outputs.SRC_TO_DEPLOY_LINK}} != "")
+        if: ${{steps.generate_links.outputs.SRC_TO_DEPLOY_LINK != ''}}
         run: |
           echo -e '------
             ### Artifact Links
@@ -118,14 +118,14 @@ jobs:
 
       # Update a comment PR Thread for describe.log
       - name: Update Comment Thread - describe.txt
-        if: (${{steps.generate_links.outputs.describetxt}} != "")
+        if: ${{steps.generate_links.outputs.describetxt != ''}}
         run: |
           echo "+ Generated [describe.txt] :white_check_mark:" >> comments.txt
           gh issue comment 36 --edit-last -F comments.txt
 
       # Update a comment PR Thread for NomenclatureReport.html
       - name: Update Comment Thread - githubPRjson
-        if: (${{steps.generate_links.outputs.githubPRjson}} != "")
+        if: ${{steps.generate_links.outputs.githubPRjson != ''}}
         run: |
           echo "+ Generated [NomenclatureReport.html] :white_check_mark:" >> comments.txt
           gh issue comment 36 --edit-last -F comments.txt
