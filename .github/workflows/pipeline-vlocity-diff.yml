@@ -113,7 +113,7 @@ jobs:
           git fetch --all
           git checkout ${{github.base_ref}}
           git checkout ${{github.head_ref}}
-          python3 ./acct-scripts/utils/vlocityCheckDiffs.py ${{github.base_ref}} > vlocityDiff.txt
+          # python3 ./acct-scripts/utils/vlocityCheckDiffs.py ${{github.base_ref}} > vlocityDiff.txt
       
       # Read pr_num file
       - name: Read vlocityDiff
