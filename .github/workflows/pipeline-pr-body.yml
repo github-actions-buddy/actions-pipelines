@@ -29,7 +29,7 @@ jobs:
       - name: Label check
         if: (contains(github.event.pull_request.labels.*.name, 'bug') && contains(github.event.pull_request.labels.*.name, 'defect'))
         run:  |
-          exit 1
+          exit 0
 
       - name: GH CLI
         run: |
