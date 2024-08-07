@@ -25,38 +25,9 @@ jobs:
     # Only executes next steps if Source branch name starts with develop
     if: ((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request'))
     steps:
-      # Create a PR comment thread
-      - name: Create PR comment Thread
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{github.event.pull_request.number}}
-          body: |
-            ## **Starting build #[${{github.run_number}}][1]**
-            ------
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Find comments in PR
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        if: ${{github.event_name == 'pull_request'}}
-        id: lastComment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          direction: last
-
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: ${{github.event_name == 'pull_request'}}
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build ${{github.run_number}}
-          description: "Build #${{github.run_number}} Started. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       # Save PR number in PR_RUN text file
       - name: Save the PR number
@@ -96,7 +67,7 @@ jobs:
 
       # Checkout the current repository
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses:  actions/checkout@v4
 
       # Install required OS packages
       # - name: Install OS dependencies
@@ -120,7 +91,7 @@ jobs:
       #     cache-dependency-path: ./acct-scripts/requirements.txt
 
       # Checking out repo before installing Node
-      - uses: actions/checkout@v3
+      - uses:  actions/checkout@v4
         name: Checkout Repository
 
       # Setup Node v18
