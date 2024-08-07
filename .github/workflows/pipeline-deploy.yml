@@ -87,6 +87,12 @@ jobs:
           pip --version
           python3 -m pip install -r "./requirements.txt"
 
+      # Install SF CLI V2
+      - name: NPM Install SF CLI
+        run: |
+          node --version
+          npm install @salesforce/cli --global
+
       # Install SFDX-Scanner
       - name: Install SFDX-Scanner
         run: |
