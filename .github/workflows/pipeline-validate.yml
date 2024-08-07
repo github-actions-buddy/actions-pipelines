@@ -1,4 +1,4 @@
-name: Pipeline SF Validation CI
+name: Pipeline Validation
 
 # Workflow run name
 run-name: Workflow run PR No - ${{ github.event.pull_request.number }} and PR title - ${{ github.event.pull_request.title }} by @${{ github.actor }}
@@ -15,7 +15,7 @@ on:
 # Environment Variables
 env:
   GIT_USER_NAME: github
-  GIT_USER_EMAIL: githubactions@altice.com
+  GIT_USER_EMAIL: githubactions@mydomain.com
   PR_NUMBER: ${{ github.event.number }}
 
 jobs:
@@ -31,7 +31,6 @@ jobs:
         with:
           issue-number: ${{github.event.pull_request.number}}
           body: |
-            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
