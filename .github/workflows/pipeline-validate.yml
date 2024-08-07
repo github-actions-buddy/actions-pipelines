@@ -25,38 +25,9 @@ jobs:
     # Only executes next steps if Source branch name starts with develop
     if: ((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request'))
     steps:
-      # Create a PR comment thread
-      - name: Create PR comment Thread
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{github.event.pull_request.number}}
-          body: |
-            ## **Starting build #[${{github.run_number}}][1]**
-            ------
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Find comments in PR
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        if: ${{github.event_name == 'pull_request'}}
-        id: lastComment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          direction: last
-
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: ${{github.event_name == 'pull_request'}}
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build ${{github.run_number}}
-          description: "Build #${{github.run_number}} Started. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       # Save PR number in PR_RUN text file
       - name: Save the PR number
@@ -96,31 +67,10 @@ jobs:
 
       # Checkout the current repository
       - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      # Install required OS packages
-      # - name: Install OS dependencies
-      #   run: |
-      #     sudo apt-get clean -y
-      #     sudo apt-get update -y
-      #     sudo apt --only-upgrade install -y zip
-      #     sudo apt --only-upgrade install -y curl
-      #     sudo apt --only-upgrade install -y wget
-      #     sudo apt install openjdk-8-jdk -y
-      #     sudo apt --only-upgrade install jq -y
-      #     sudo apt --only-upgrade install grep -y
-      #     sudo apt autoremove -y
-
-      # Setup python v3.7
-      # - uses: actions/setup-python@v4
-      #   name: Install Python v3.7 and cache pip
-      #   with:
-      #     python-version: "3.7"
-      #     cache: "pip" # caching pip dependencies
-      #     cache-dependency-path: ./acct-scripts/requirements.txt
+        uses:  actions/checkout@v4
 
       # Checking out repo before installing Node
-      - uses: actions/checkout@v3
+      - uses:  actions/checkout@v4
         name: Checkout Repository
 
       # Setup Node v18
@@ -138,16 +88,6 @@ jobs:
       #     echo "$HOME/sfdx/bin" >> $GITHUB_PATH
       #     echo The PATH is $GITHUB_PATH
       #     ~/sfdx/bin/sfdx version
-
-      # Install SF CLI V2
-      - name: Install SF CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
-          mkdir ~/cli/sf && ls -la
-          tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
-          echo "$HOME/sf/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/sf/bin/sf version
 
       # Install SF CLI V2
       - name: NPM Install SF CLI

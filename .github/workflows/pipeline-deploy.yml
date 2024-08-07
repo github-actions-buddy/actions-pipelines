@@ -6,7 +6,8 @@ run-name: Workflow run PR No - ${{ github.event.pull_request.number }} and PR ti
 # Workflow triggers
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: 
+      - labeled
     branches:
       - develop
     paths-ignore:
@@ -14,49 +15,23 @@ on:
 
 # Environment Variables
 env:
+  # REGISTRY: ghcr.io
+  # IMAGE_NAME: ${{ github.repository }}
   GIT_USER_NAME: github
   GIT_USER_EMAIL: githubactions@mydomain.com
-  PR_NUMBER: ${{ github.event.number }}
 
 jobs:
-  installation_authenticate_validate:
+  installation_authenticate_deploy:
     runs-on: ubuntu-latest
-    environment: DEV-CI
-    # Only executes next steps if Source branch name starts with develop
-    if: ((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request') && (github.event.label.name == 'Deploy'))
+    # environment: DEVCI-NEW
+    # Only executes next steps if Source branch name starts with feature or defect and the label 'Ready for Deploy' exists 
+    if: (((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request')) && (github.event.label.name == 'Deploy'))
+    env:
+      GH_TOKEN: ${{secrets.V_METADATA_SEC}}
     steps:
-      # Create a PR comment thread
-      - name: Create PR comment Thread
-        uses: peter-evans/create-or-update-comment@v2
-        with:
-          issue-number: ${{github.event.pull_request.number}}
-          body: |
-            ## **Starting build #[${{github.run_number}}][1]**
-            ------
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      # Find comments in PR
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        if: ${{github.event_name == 'pull_request'}}
-        id: lastComment
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          direction: last
-
-      # Set PullRequest Status
-      - name: Set PR Status
-        if: ${{github.event_name == 'pull_request'}}
-        uses: teamniteo/pull_request_status_action@v1.0.0
-        with:
-          pr_number: ${{github.event.pull_request.number}}
-          state: success
-          repository: ${{ github.repository }}
-          context: Build ${{github.run_number}}
-          description: "Build #${{github.run_number}} Started. "
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Checkout the current repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       # Save PR number in PR_RUN text file
       - name: Save the PR number
@@ -70,7 +45,7 @@ jobs:
       # Upload PR number
       - name: Upload Artifact PR number
         if: ${{github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pr_num
           path: ./pr_num.txt
@@ -88,66 +63,29 @@ jobs:
       # Upload the source branch of Pull request
       - name: Upload Artifact source branch of Pull request
         if: ${{github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: branch_name
           path: ./branch_name.txt
           retention-days: 1
-
-      # Checkout the current repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      # Install required OS packages
-      # - name: Install OS dependencies
-      #   run: |
-      #     sudo apt-get clean -y
-      #     sudo apt-get update -y
-      #     sudo apt --only-upgrade install -y zip
-      #     sudo apt --only-upgrade install -y curl
-      #     sudo apt --only-upgrade install -y wget
-      #     sudo apt install openjdk-8-jdk -y
-      #     sudo apt --only-upgrade install jq -y
-      #     sudo apt --only-upgrade install grep -y
-      #     sudo apt autoremove -y
-
-      # Setup python v3.7
-      # - uses: actions/setup-python@v4
-      #   name: Install Python v3.7 and cache pip
-      #   with:
-      #     python-version: "3.7"
-      #     cache: "pip" # caching pip dependencies
-      #     cache-dependency-path: ./acct-scripts/requirements.txt
-
-      # Checking out repo before installing Node
-      - uses: actions/checkout@v3
-        name: Checkout Repository
-
-      # Setup Node v18
-      # - uses: actions/setup-node@v3
-      #   name: Install Node v18
-      #   with:
-      #     node-version: "18"
-
-      # Install the SFDX-CLI
-      # - name: Install SFDX-CLI
-      #   run: |
-      #     wget https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
-      #     mkdir ~/sfdx && ls -la
-      #     tar xJf sfdx-linux-x64.tar.xz -C ~/sfdx --strip-components 1
-      #     echo "$HOME/sfdx/bin" >> $GITHUB_PATH
-      #     echo The PATH is $GITHUB_PATH
-      #     ~/sfdx/bin/sfdx version
-
-      # Install SF CLI V2
-      - name: Install SF CLI
+      
+      # Create a PR comment thread
+      - name: Create PR comment Thread
         run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
-          mkdir ~/cli/sf && ls -la
-          tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
-          echo "$HOME/sf/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/sf/bin/sf version
+          echo -e 'PR Comment
+            ## **Starting build #[${{github.run_number}}][1]**
+            ------
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}' > comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} -F comments.txt
+
+      # Install requirements.txt
+      - name: Install requirements.txt
+        run: |
+          ls -l
+          node --version
+          python --version
+          pip --version
+          python3 -m pip install -r "./requirements.txt"
 
       # Install SF CLI V2
       - name: NPM Install SF CLI
@@ -155,9 +93,335 @@ jobs:
           node --version
           npm install @salesforce/cli --global
 
-      # Verify
-      - name: Verify Installation
+      # Install SFDX-Scanner
+      - name: Install SFDX-Scanner
         run: |
-          sf --version
-          sf commands
-          sf whatsnew
+          sfdx plugins:install @salesforce/sfdx-scanner@v3.26.0 
+
+      # Git Version Check
+      - name: Git Version Check
+        run: |
+          # sudo apt update
+          # sudo apt-get install -y git
+          git --version
+
+      # Update comment in PR Thread: OS dependencies installed
+      - name: Update Comment Thread - Dependencies installed
+        if: ${{github.event_name == 'pull_request'}}
+        run: |
+          echo "+ All Dependencies Installed" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Upload the output to ./describe.log
+      - uses: actions/upload-artifact@v4
+        name: Artfifact Upload - ./describe.log
+        with:
+          name: describe.log
+          path: ./describe.log
+          retention-days: 1
+
+      # Update comment in PR Thread: Salesforce-Auth-Success
+      - name: Update Comment Thread - Salesforce authentication successful
+        if: (github.event_name == 'pull_request' && steps.sfdxAuthenticate.outcome =='success')
+        run: |
+          echo "+ Salesforce Authentication Successful :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Update comment in PR Thread: Salesforce-Auth-Failed
+      - name: Update Comment Thread - Salesforce authentication failed
+        if: (github.event_name == 'pull_request' && steps.sfdxAuthenticate.outcome =='failure')
+        run: |
+          echo "+ Salesforce Authentication Failed :x:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Configure a global user for Git
+      - name: Configure Global User for Git
+        run: |
+          git config --global user.email ${{ env.GIT_USER_NAME }}
+          git config --global user.name ${{ env.GIT_USER_EMAIL }}
+          git config --global diff.renameLimit 5000
+          git config core.quotepath off
+      
+      # Clean up vlocityDiff.txt
+      - name: Clean up step - vlocityDiff.txt
+        run: |
+          sudo rm -rf vlocityDiff.txt
+          ls -la
+
+      # Get the difference in vlocity folder
+      - name: Getting Vlocity Diffs
+        id: VlocityDiff
+        continue-on-error: true
+        run: |
+          git fetch origin ${{github.head_ref}}
+          git fetch origin ${{github.base_ref}}
+          git checkout ${{github.base_ref}}
+          git checkout ${{github.head_ref}}
+      
+      # Read pr_num file
+      - name: Read vlocityDiff
+        id: get_vlocityDiff
+        run: |
+          vlocityDiff=$(cat ./vlocityDiff.txt)
+          echo "Vloicty Difference between source and target is:"
+          echo "$vlocityDiff"
+
+      # Update a comment in PR Thread
+      - name: Update Comment Thread - Delta Package-Not Built
+        if: (steps.MergerDX.outcome != 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Salesforce Delta Package Not Built :warning:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Echo if MergerDX script fails
+      - name: Pipeline Delta Package did not built
+        if: (steps.MergerDX.outcome != 'success')
+        run: |
+          echo "::warning::Step MegerDX Failed: Salesforce Delta Package not built"
+
+      # Upload the output to ./srcToDeploy.zip
+      - uses: actions/upload-artifact@v4
+        if: (steps.MergerDX.outcome == 'success')
+        name: Artfifact Upload - ./srcToDeploy.zip
+        with:
+          name: srcToDeploy.zip
+          path: ./srcToDeploy.zip
+
+      - name: Update Comment Thread - Delta Package Built Successfully
+        if: (github.event_name == 'pull_request' && steps.MergerDX.outcome == 'success')
+        run: |
+          echo -e "+ Salesforce Delta Package Built Successfully srcToDeploy.zip :white_check_mark:\n Navigate to workflow run URL: [1] :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+  
+      # Upload Artifact nomenclature-errors.html
+      - uses: actions/upload-artifact@v4
+        name: Artifact Upload - ./nomenclature-errors.html
+        if: (steps.MergerDX.outcome == 'success')
+        with:
+          name: nomenclatureErrorsReport
+          path: ./nomenclature-errors.html
+          retention-days: 15
+
+      # Update a comment in PR Thread: Nomenclature-Success
+      - name: Update Comment Thread - Nomenclature validation build succesfully
+        if: (steps.nomenclatureValidation.outcome == 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Nomenclature validation build succesfully :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Update a comment in PR Thread: Nomenclature-Fails
+      - name: Update Comment Thread - Nomenclature validation failed
+        if: (steps.MergerDX.outcome == 'success' && steps.nomenclatureValidation.outcome != 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Nomenclature validation failed :x:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Upload sfdxScannerReport.html
+      - uses: actions/upload-artifact@v4
+        if: (steps.sfdxScanner.outcome == 'success')
+        name: Artifact Upload - ./sfdxScannerReport.html
+        with:
+          name: sfdxScannerReport.html
+          path: ./sfdxScannerReport.html
+          retention-days: 15
+      
+      # Clean up pullRequestBody
+      - name: Clean up step - pullRequestBody.txt
+        run: |
+          sudo rm -rf pullRequestBody.txt
+          ls -la
+
+      # Print ENV PR_TESTS
+      - name: Echo PR_TESTS
+        run: echo ${{env.PR_TESTS}}
+
+      # Update a comment in PR Thread: If unit tests are defined otherwise skip this step
+      - name: Update Comment Thread - Unit Tests to be run
+        if: (env.PR_TESTS != '' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Unit Tests to be run: ${{ env.PR_TESTS }}" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Setting up sfdx force:source:deploy based on the unit tests for the validate and deploy
+      # If unit tests are present then first run those unit test and then deploy
+      # If unit tests are absent then print No tests to run
+      - name: Test Composition
+        # id: testString
+        # echo ::set-output name=TEST_STRING::$testString
+        run: |
+          testToRun='${{env.PR_TESTS}}';
+          if [ -z "$testToRun" ]; then
+            testString=''
+            echo "No Test to run"
+          else
+            testString='--test-level RunSpecifiedTests --tests ${{env.PR_TESTS}}'
+          fi
+          echo "TEST_STRING=$testString" >> $GITHUB_ENV
+
+      - name: ENV Variables Temp
+        if: (steps.MergerDX.outcome == 'success')
+        continue-on-error: true
+        run: |
+          cat ORGS/.env.DEVCI-NEW
+
+      # SFDX deploy cmd with check only flag, for unit tests execution
+      - name: SFDX Validate
+        id: sfdxValidate
+        if: (steps.MergerDX.outcome == 'success')
+        continue-on-error: true
+        run: |
+          echo 'Hello'
+
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./validate.json
+        id: sfdxValidateArtifact
+        if: (steps.sfdxValidate.outcome != 'skipped')
+        uses: actions/upload-artifact@v4
+        with:
+          name: validate.json
+          path: ./validate.json
+          retention-days: 15
+
+      # Upload the sf validation report
+      - name: Artifact Upload - ./SF_Validation_Report.html
+        if: (steps.sfValidationReport.outcome != 'skipped')
+        uses: actions/upload-artifact@v4
+        with:
+          name: SF_Validation_Report.html
+          path: ./SF_Validation_Report.html
+          retention-days: 7
+
+      # Update a comment in PR Thread: Validation-success
+      - name: Update Comment Thread - SFDX Validate Success
+        if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode == 0 && github.event_name == 'pull_request')
+        run: |
+          echo "+ Salesforce Validation Successful :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Update a comment in PR Thread: Validation-failed
+      - name: Update comment - SFDX Validate Failed
+        if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode != 0 && github.event_name == 'pull_request')
+        run: |
+          echo "+ Salesforce Validation Failed :x:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Stop the pipeline because unit tests are failed
+      - name: Cancel Pipeline Validate Fails
+        if: (steps.parseJson.outcome == 'success' && env.SfdxValidateStatusCode != 0)
+        run: |
+          echo "::error::SFDX Validation Failed: Stop pipeline"
+          exit 1
+
+      # Update a comment in PR Thread: Deployment-success
+      - name: Update Comment Thread - SFDX Deploy comment Success
+        if: ((steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success') && (github.event_name == 'pull_request'))
+        run: |
+          echo "+ Salesforce Deployment Successful :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Upload the output of force:sorce:deploy cmd in json file
+      - name: Artifact Upload - ./deploy.json
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success')
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy.json
+          path: ./deploy.json
+          retention-days: 15
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Update Comment Thread - SFDX Deploy Failure
+        if: ((steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure') && (github.event_name == 'pull_request'))
+        run: |
+          echo "+ Salesforce Deployment Failed :x:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Stop the pipeline if force:source:deploy fails
+      - name: Cancel Pipeline Deploy Fails
+        if: (steps.sfdxDeploy.outcome == 'failure' || steps.sfdxQuickDeploy.outcome == 'failure')
+        run: |
+          echo "::error::SFDX Deploy Failed: Stop pipeline"
+          exit 1
+
+      # Install Puppeteer
+      - name: Install Puppeteer
+        if: (steps.VlocityDiff.outcome == 'failure')
+        run: |
+          ls -l
+          npm install puppeteer -g
+
+      # Install Vlocity
+      - name: Install Vlocity
+        if: (steps.VlocityDiff.outcome == 'failure')
+        run: |
+          npm install --global vlocity
+          vlocity --version
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Update Comment Thread - Vlocity Tools Installed
+        if: (steps.VlocityDiff.outcome == 'failure')
+        run: |
+          echo "+ Vlocity Tools Installed" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Deploy the difference in vlocity folder to instance
+      - name: Deploy Vlocity
+        id: vlocityDeploy
+        if: (steps.VlocityDiff.outcome == 'failure')
+        continue-on-error: true
+        run: |
+          echo 'vlocity deploy'
+
+      # Upload the output to ./VlocityBuildErrors.log
+      - uses: actions/upload-artifact@v4
+        if: (steps.vlocityDeploy.outcome == 'failure')
+        name: Artifact Upload - Vlocity build Errors
+        with:
+          name: VlocityBuildErrors.log
+          path: ./VlocityBuildErrors.log
+          retention-days: 15
+
+      # Clean up downloaded directories
+      - name: Clean up step
+        if: (steps.regex-match.outcome == 'success' || steps.regex-match.outcome == 'failure')
+        run: |
+          sudo rm -rf pullRequestBody.txt
+          ls -la
+
+      # Update a comment in PR Thread: Vlocity-failed
+      - name: Update Comment Thread - Vlocity Failure
+        if: (steps.vlocityDeploy.outcome == 'failure' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Vlocity Deployment Failed :x:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Update a comment in PR Thread: Vlocity-Success
+      - name: Update Comment Thread - Vlocity Success
+        if: (steps.vlocityDeploy.outcome == 'success' && github.event_name == 'pull_request')
+        run: |
+          echo "+ Vlocity Deployment Success :white_check_mark:" >> comments.txt
+          gh issue comment ${{ github.event.pull_request.number }} --edit-last -F comments.txt
+
+      # Stop the pipeline if vlocity deploy fails
+      - name: Cancel Pipeline Vlocity Fails
+        if: (steps.vlocityDeploy.outcome == 'failure')
+        run: |
+          echo "::error::vlocity Deploy Failed: Stop pipeline"
+          exit 1
+
+      # Update a comment in PR Thread: Deployment-failed
+      - name: Approve PR
+        id: ApprovePR
+        if: (steps.sfdxDeploy.outcome == 'success' || steps.sfdxQuickDeploy.outcome == 'success' || steps.vlocityDeploy.outcome == 'success')
+        continue-on-error: true
+        run: |
+          echo "Login: @${{ github.event.pull_request.user.login }}"
+          username=${{ github.event.pull_request.user.login }}
+          if [[ "$username" == "github-actions-buddy" ]]; then
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "Pull Request Review by GitHub-Actions[Bot]
+            ----
+            @${{ github.event.pull_request.user.login }} Deployment is Completed. Cant approve your own pull request !"
+          else
+            gh pr review ${{ github.event.pull_request.number }} --approve --body "Pull Request Review by GitHub-Actions[Bot]
+            ----
+            @${{ github.event.pull_request.user.login }} Deployment is Completed, please review. Pull Request changes approved :white_check_mark:"
+          fi
