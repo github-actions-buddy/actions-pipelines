@@ -1,4 +1,4 @@
-name: Cache Warmup solution workflow for PRODUCTION
+name: Cache Warmup workflow
 
 # Workflow run name
 run-name: Cache Warmup solution workflow run - ${{github.run_number}} for PRODUCTION
