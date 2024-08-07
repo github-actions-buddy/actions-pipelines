@@ -1,4 +1,4 @@
-name: Pipeline CI
+name: Pipeline Manual
 
 # Workflow run name
 run-name: Workflow run No - ${{ github.run_number }} by @${{ github.actor }}
@@ -62,7 +62,7 @@ on:
 # Environment Variables
 env:
   GIT_USER_NAME: github
-  GIT_USER_EMAIL: githubactions@gmail.com
+  GIT_USER_EMAIL: githubactions@mydomain.com
   PR_NUMBER: ${{ github.event.number }}
   TARGET_ENVIRONMNET: ${{ inputs.targetEnv }}
 
