@@ -69,27 +69,6 @@ jobs:
       - name: Checkout Repository
         uses:  actions/checkout@v4
 
-      # Install required OS packages
-      # - name: Install OS dependencies
-      #   run: |
-      #     sudo apt-get clean -y
-      #     sudo apt-get update -y
-      #     sudo apt --only-upgrade install -y zip
-      #     sudo apt --only-upgrade install -y curl
-      #     sudo apt --only-upgrade install -y wget
-      #     sudo apt install openjdk-8-jdk -y
-      #     sudo apt --only-upgrade install jq -y
-      #     sudo apt --only-upgrade install grep -y
-      #     sudo apt autoremove -y
-
-      # Setup python v3.7
-      # - uses: actions/setup-python@v4
-      #   name: Install Python v3.7 and cache pip
-      #   with:
-      #     python-version: "3.7"
-      #     cache: "pip" # caching pip dependencies
-      #     cache-dependency-path: ./acct-scripts/requirements.txt
-
       # Checking out repo before installing Node
       - uses:  actions/checkout@v4
         name: Checkout Repository
@@ -109,16 +88,6 @@ jobs:
       #     echo "$HOME/sfdx/bin" >> $GITHUB_PATH
       #     echo The PATH is $GITHUB_PATH
       #     ~/sfdx/bin/sfdx version
-
-      # Install SF CLI V2
-      - name: Install SF CLI
-        run: |
-          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
-          mkdir ~/cli/sf && ls -la
-          tar xJf sf-linux-x64.tar.xz -C ~/cli/sf --strip-components 1
-          echo "$HOME/sf/bin" >> $GITHUB_PATH
-          echo The PATH is $GITHUB_PATH
-          ~/sf/bin/sf version
 
       # Install SF CLI V2
       - name: NPM Install SF CLI
