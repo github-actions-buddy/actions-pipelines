@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: DEV-CI
     # Only executes next steps if Source branch name starts with develop
-    if: ((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request'))
+    if: ((startswith(github.head_ref,'feature') || startswith(github.head_ref,'defect')) && (github.event_name == 'pull_request') && (github.event.label.name == 'Deploy'))
     steps:
       # Create a PR comment thread
       - name: Create PR comment Thread
@@ -31,7 +31,6 @@ jobs:
         with:
           issue-number: ${{github.event.pull_request.number}}
           body: |
-            ![Altice_Logo](https://play-lh.googleusercontent.com/ld9BbSXJcTilPGb_uQCrgxI9ZvtORR8jh45yoBxwuyq8vDZDKYQZozUrKZz0xGSODw=w240-h480-rw)
             ## **Starting build #[${{github.run_number}}][1]**
             ------
             [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
